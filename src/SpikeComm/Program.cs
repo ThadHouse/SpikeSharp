@@ -22,7 +22,7 @@ namespace SpikeComm
 
             while (true)
             {
-                var val = await hub.ReadLine();
+                var val = await hub.ReadLineAsync();
                 if (val == null)
                 {
                     return;

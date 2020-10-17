@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.VisualStudio.Threading;
+using Newtonsoft.Json;
 using StreamJsonRpc;
 using System;
 using System.Buffers;
@@ -29,6 +30,8 @@ namespace SpikeLib
             serialPort = new SerialPort(comPort, 115200);
         }
 
+        private Task? RunLoop;
+
         public async Task OpenAsync()
         {
             await Task.Run(() =>
@@ -39,48 +42,34 @@ namespace SpikeLib
                 serialPort.Parity = Parity.None;
                 serialPort.DtrEnable = true;
                 serialPort.Open();
-                //jsonRpc = JsonRpc.Attach(serialPort.BaseStream);
-                dataThread = new Thread(ThreadMain);
-                dataThread.Start();
+                RunLoop = ThreadMainAsync();
             });
         }
 
-
-
-        private void ThreadMain()
+        private async Task ThreadMainAsync()
         {
             var token = tokenSource.Token;
-            serialPort.ReadTimeout = 500;
-            Span<byte> singleByte = stackalloc byte[1];
+            var stream = serialPort.BaseStream;
+            stream.ReadTimeout = 100;
+            var pipe = dataPipe.Writer;
             while (!token.IsCancellationRequested)
             {
-                try
+                var memory = pipe.GetMemory(2048);
+                int readBytes = await stream.ReadAsync(memory, token);
+                if (readBytes < 0)
                 {
-                    int value = serialPort.ReadByte();
-                    if (value < 0)
-                    {
-                        dataPipe.Writer.Complete();
-                        break;
-                    }
-                    singleByte[0] = (byte)value;
-                    dataPipe.Writer.Write(singleByte);
-                    if (value == '\r')
-                    {
-                        dataPipe.Writer.FlushAsync().AsTask().Wait();
-                    }
-                }
-                catch (TimeoutException)
-                {
-                    int numBytes = serialPort.BytesToRead;
-                    continue;
-                }
+                    await pipe.CompleteAsync();
+                } 
+                pipe.Advance(readBytes);
+                await pipe.FlushAsync(token);
             }
         }
 
         bool isFirstLine = true;
         byte[] mChar = new byte[] { (byte)'m' };
+        byte[] pChar = new byte[] { (byte)'p' };
 
-        public async Task<string?> ReadLine()
+        public async Task<string?> ReadLineAsync()
         {
 
             var reader = dataPipe.Reader;
@@ -107,9 +96,15 @@ namespace SpikeLib
                     else
                     {
                         using var document = JsonDocument.Parse(line);
-                        var methodId = document.RootElement.GetProperty(mChar).GetInt32();
-                        toRet = methodId.ToString();
+                        var methodProperty = document.RootElement.GetProperty(mChar);
+                        string methodId = "";
+                        if (methodProperty.ValueKind == JsonValueKind.Number || methodProperty.ValueKind == JsonValueKind.String)
+                        {
+                            methodId = methodProperty.GetRawText();
+                        }
+                        var properties = document.RootElement.GetProperty(pChar).GetRawText();
 
+                        toRet = $"{methodId} : {properties}";
                     }
 
                     // Skip the line + the \n character (basically position)
