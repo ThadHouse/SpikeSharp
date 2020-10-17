@@ -1,28 +1,39 @@
-﻿using Newtonsoft.Json;
-using SpikeLib;
+﻿using SpikeLib;
 using System;
+using System.IO.Ports;
+using System.Management;
 using System.Threading.Tasks;
 
 namespace SpikeComm
 {
-    internal class RpcData
-    {
-        [JsonProperty(PropertyName = "m")]
-        public int Method { get; set; }
-    }
-
     class Program
     {
+
+
         static async Task Main(string[] args)
         {
-            SpikeHub hub = new SpikeHub("COM8");
-            await hub.OpenAsync();
+            //var portNames = SerialPort.GetPortNames();
+            //ManagementClass objInst = new ManagementClass("Win32_SerialPort");
+            //var instances = objInst.GetInstances();
 
-            uint count = 0;
+            //foreach (var inst in instances)
+            //{
+            //    Console.WriteLine(inst.ClassPath);
+            //    foreach (var prop in inst.Properties)
+            //    {
+            //        Console.WriteLine(prop.Name + " : " + prop.Value);
+            //    }
+            //}
+            //;
+
+            SpikeHub hub = new SpikeHub("COM5");
+            await hub.OpenAsync();
+            
+
 
             while (true)
             {
-                var val = await hub.ReadLineAsync();
+                var val = await hub.ReadMessageAsync();
                 if (val == null)
                 {
                     return;

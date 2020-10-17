@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json;
+using SpikeLib.Messages;
 using StreamJsonRpc;
 using System;
 using System.Buffers;
@@ -19,10 +20,7 @@ namespace SpikeLib
         public string Port { get; }
         private SerialPort serialPort;
         Pipe dataPipe = new Pipe();
-        Thread? dataThread;
         CancellationTokenSource tokenSource = new CancellationTokenSource();
-
-        JsonRpc jsonRpc = null!;
 
         public SpikeHub(string comPort)
         {
@@ -83,11 +81,11 @@ namespace SpikeLib
         byte[] mChar = new byte[] { (byte)'m' };
         byte[] pChar = new byte[] { (byte)'p' };
 
-        public async Task<string?> ReadLineAsync()
+        public async Task<IMessage> ReadMessageAsync()
         {
 
             var reader = dataPipe.Reader;
-            string? toRet = null;
+            IMessage? toRet = null;
             while (true)
             {
                 ReadResult result = await reader.ReadAsync();
@@ -110,15 +108,7 @@ namespace SpikeLib
                     else
                     {
                         using var document = JsonDocument.Parse(line);
-                        var methodProperty = document.RootElement.GetProperty(mChar);
-                        string methodId = "";
-                        if (methodProperty.ValueKind == JsonValueKind.Number || methodProperty.ValueKind == JsonValueKind.String)
-                        {
-                            methodId = methodProperty.GetRawText();
-                        }
-                        var properties = document.RootElement.GetProperty(pChar).GetRawText();
-
-                        toRet = $"{methodId} : {properties}";
+                        toRet = IMessage.ParseMessage(document);
                     }
 
                     // Skip the line + the \n character (basically position)
@@ -132,14 +122,6 @@ namespace SpikeLib
                 {
                     return toRet;
                 }
-
-                // Stop reading if there's no more data coming
-                if (result.IsCompleted)
-                {
-                    return null;
-                }
-
-
             }
         }
     }
