@@ -42,8 +42,19 @@ namespace SpikeLib
                 serialPort.Parity = Parity.None;
                 serialPort.DtrEnable = true;
                 serialPort.Open();
-                RunLoop = ThreadMainAsync();
+                tokenSource = new CancellationTokenSource();
+                RunLoop = Task.Run(() => ThreadMainAsync());
             });
+        }
+
+        public async Task CloseAsync()
+        {
+            tokenSource.Cancel();
+            if (RunLoop != null)
+            {
+                await RunLoop;
+                RunLoop = null;
+            }
         }
 
         private async Task ThreadMainAsync()
@@ -63,7 +74,10 @@ namespace SpikeLib
                 pipe.Advance(readBytes);
                 await pipe.FlushAsync(token);
             }
+            serialPort.Close();
         }
+
+        
 
         bool isFirstLine = true;
         byte[] mChar = new byte[] { (byte)'m' };
