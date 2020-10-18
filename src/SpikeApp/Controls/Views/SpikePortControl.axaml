@@ -4,5 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SpikeApp.Controls.Views.SpikePortControl">
-    Welcome to Avalonia!
+  <StackPanel>
+    <ComboBox HorizontalAlignment="Stretch" Items="{Binding Devices, Mode=TwoWay}" SelectedItem="{Binding SelectedDevice}"></ComboBox>
+    <Grid
+     ColumnDefinitions="50*, 50*"
+     HorizontalAlignment="Stretch">
+      <Button Grid.Column="0" HorizontalAlignment="Stretch" Command="{Binding Connect}" Content="{Binding ConnectText}"></Button>
+      <Button Grid.Column="1" HorizontalAlignment="Stretch" Command="{Binding RefreshDevices}">Refresh Devices</Button>
+    </Grid>
+
+  </StackPanel>
 </UserControl>
