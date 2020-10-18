@@ -1,4 +1,5 @@
 ﻿using SpikeLib;
+using SpikeLib.Messages;
 using System;
 using System.IO.Ports;
 using System.Management;
@@ -26,7 +27,7 @@ namespace SpikeComm
             //}
             //;
 
-            SpikeHub hub = new SpikeHub("COM5");
+            SpikeHub hub = new SpikeHub("COM8");
             await hub.OpenAsync();
             
 
@@ -38,6 +39,7 @@ namespace SpikeComm
                 {
                     return;
                 }
+                if (val is BatteryMessage || val is PortStatusMessage) continue;
                 Console.WriteLine(val);
                 ;
             }

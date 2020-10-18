@@ -18,8 +18,8 @@ namespace SpikeLib
     public class SpikeHub
     {
         public string Port { get; }
-        private SerialPort serialPort;
-        Pipe dataPipe = new Pipe();
+        private readonly SerialPort serialPort;
+        private readonly Pipe dataPipe = new Pipe();
         CancellationTokenSource tokenSource = new CancellationTokenSource();
 
         public SpikeHub(string comPort)
@@ -78,8 +78,6 @@ namespace SpikeLib
         
 
         bool isFirstLine = true;
-        byte[] mChar = new byte[] { (byte)'m' };
-        byte[] pChar = new byte[] { (byte)'p' };
 
         public async Task<IMessage> ReadMessageAsync()
         {
