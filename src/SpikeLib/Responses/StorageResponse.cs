@@ -83,6 +83,8 @@ namespace SpikeLib.Responses
         private string rawString;
         public StorageResponse(string id, JsonDocument document)
         {
+            var storageText = document.RootElement.GetRawText();
+            Console.WriteLine(storageText);
             var properties = document.RootElement.GetProperty(stackalloc byte[] { (byte)'r' });
             var storage = properties.GetProperty("storage");
             Storage = new StorageStats(storage);

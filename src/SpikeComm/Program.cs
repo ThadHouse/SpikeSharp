@@ -1,6 +1,7 @@
 ﻿using SpikeLib;
 using SpikeLib.Messages;
 using System;
+using System.IO;
 using System.IO.Ports;
 using System.Management;
 using System.Threading.Tasks;
@@ -34,6 +35,11 @@ namespace SpikeComm
 
             var storage = await hub.RequestStorageAsync();
             Console.WriteLine(storage);
+
+            {
+                using var stream = File.OpenRead(@"C:\Users\thadh\Documents\LEGO MINDSTORMS\PythonYeet.py");
+                await hub.UploadFileAsync(stream, 7, "HelloSharp");
+            }
 
             var reader = hub.UnknownMessagesReader;
 

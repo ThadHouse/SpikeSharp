@@ -18,6 +18,9 @@ namespace SpikeLib.Messages
                 {
                     switch (methodProperty.GetInt32())
                     {
+                        case 1:
+                            // Storage response, replied upon successful file upload
+                            break;
                         case 0:
                             // Port Status
                             return new PortStatusMessage(document);
@@ -65,6 +68,10 @@ namespace SpikeLib.Messages
                 {
                     case '0':
                         return new StorageResponse(idVal, document);
+                    case '1':
+                        return new StartWriteProgramResponse(idVal, document);
+                    case '2':
+                        return new WritePackageResponse(idVal, document);
                 }
                 return new UnknownMessage(document.RootElement.GetRawText());
             }

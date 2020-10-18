@@ -27,6 +27,7 @@ namespace SpikeLib
         private readonly Channel<IMessage> unknownMessagesChannel;
         private readonly Channel<StorageResponse> storageResponseChannel;
         private readonly Channel<IConsoleMessage> consoleMessagesChannel;
+        private readonly Channel<IResponse> programWriteChannel;
 
         public ChannelReader<IMessage> UnknownMessagesReader => unknownMessagesChannel.Reader;
         public ChannelReader<IConsoleMessage> ConsoleMessagesReader => consoleMessagesChannel.Reader;
@@ -38,6 +39,7 @@ namespace SpikeLib
             unknownMessagesChannel = Channel.CreateUnbounded<IMessage>();
             storageResponseChannel = Channel.CreateUnbounded<StorageResponse>();
             consoleMessagesChannel = Channel.CreateUnbounded<IConsoleMessage>();
+            programWriteChannel = Channel.CreateUnbounded<IResponse>();
         }
 
         CancellationTokenSource tokenSource = new CancellationTokenSource();
@@ -130,6 +132,7 @@ namespace SpikeLib
                     }
                     catch (Exception ex)
                     {
+                        ;
                         // TODO handle parsing exception
                     }
                     buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
@@ -141,6 +144,7 @@ namespace SpikeLib
             unknownMessagesChannel.Writer.Complete();
             storageResponseChannel.Writer.Complete();
             consoleMessagesChannel.Writer.Complete();
+            programWriteChannel.Writer.Complete();
         }
 
         private async ValueTask HandleMessageAsync(IMessage message, CancellationToken token)
@@ -148,6 +152,14 @@ namespace SpikeLib
             if (message is StorageResponse storage)
             {
                 await storageResponseChannel.Writer.WriteAsync(storage, token);
+            }
+            else if (message is StartWriteProgramResponse startResponse)
+            {
+                await programWriteChannel.Writer.WriteAsync(startResponse, token);
+            }
+            else if (message is WritePackageResponse writePackage)
+            {
+                await programWriteChannel.Writer.WriteAsync(writePackage, token);
             }
             else
             {
@@ -157,7 +169,6 @@ namespace SpikeLib
 
         public async Task<StorageResponse> RequestStorageAsync(CancellationToken cancellationToken = default)
         {
-            string randomString;
             using var stream = new MemoryStream();
             {
                 using var writer = new Utf8JsonWriter(stream);
@@ -166,7 +177,7 @@ namespace SpikeLib
                 writer.WriteStartObject("p");
                 writer.WriteEndObject();
 
-                randomString = "0abc";
+                string randomString = "0abc";
 
                 writer.WriteString("i", randomString);
                 writer.WriteEndObject();
@@ -176,6 +187,81 @@ namespace SpikeLib
             await stream.CopyToAsync(serialPort.BaseStream, cancellationToken);
 
             return await storageResponseChannel.Reader.ReadAsync(cancellationToken);
+        }
+
+        public async Task<bool> UploadFileAsync(Stream fileToUpload, int slot, string name, CancellationToken cancellationToken = default)
+        {
+
+            using var postStream = new MemoryStream();
+            {
+                using var writer = new Utf8JsonWriter(postStream);
+                writer.WriteStartObject();
+                var nowTime = DateTime.UtcNow.Ticks;
+                writer.WriteString("m", "start_write_program");
+
+                writer.WriteStartObject("p");
+                writer.WriteNumber("slotid", slot);
+                writer.WriteNumber("size", fileToUpload.Length);
+
+                writer.WriteStartObject("meta");
+                writer.WriteNumber("created", nowTime);
+                writer.WriteNumber("modified", nowTime);
+                writer.WriteBase64String("name", Encoding.UTF8.GetBytes(name));
+                writer.WriteString("type", "python");
+                writer.WriteString("project_id", "HelloWorld12");
+                writer.WriteEndObject();
+
+                writer.WriteEndObject();
+                string randomString = "1abc";
+
+                writer.WriteString("i", randomString);
+                writer.WriteEndObject();
+            }
+
+            postStream.WriteByte(13);
+            postStream.Seek(0, SeekOrigin.Begin);
+            await postStream.CopyToAsync(serialPort.BaseStream, cancellationToken);
+
+            var readValue = await programWriteChannel.Reader.ReadAsync();
+
+            var startResponse = (StartWriteProgramResponse)readValue;
+
+            Memory<byte> memoryBuffer = new byte[startResponse.BlockSize];
+
+            do
+            {
+                var readBytes = await fileToUpload.ReadAsync(memoryBuffer, cancellationToken);
+                postStream.Seek(0, SeekOrigin.Begin);
+                postStream.SetLength(0);
+
+                {
+                    using var writer = new Utf8JsonWriter(postStream);
+                    writer.WriteStartObject();
+                    writer.WriteString("m", "write_package");
+
+                    writer.WriteStartObject("p");
+                    writer.WriteBase64String("data", memoryBuffer.Span.Slice(0, readBytes));
+                    writer.WriteString("transferid", startResponse.TransferId);
+                    writer.WriteEndObject();
+
+                    string randomString = "2abc";
+
+                    writer.WriteString("i", randomString);
+                    writer.WriteEndObject();
+                }
+
+                postStream.WriteByte(13);
+                postStream.Seek(0, SeekOrigin.Begin);
+                await postStream.CopyToAsync(serialPort.BaseStream, cancellationToken);
+
+                var readWriteResponse = await programWriteChannel.Reader.ReadAsync();
+                ;
+
+            }
+            while (fileToUpload.Position < fileToUpload.Length);
+            ;
+
+            return true;
         }
     }
 }
