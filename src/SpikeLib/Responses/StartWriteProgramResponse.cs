@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace SpikeLib.Responses
 {
@@ -18,6 +14,11 @@ namespace SpikeLib.Responses
 
         public StartWriteProgramResponse(string id, JsonDocument document)
         {
+            if (document == null)
+            {
+                throw new ArgumentNullException(nameof(document));
+            }
+
             Id = id;
             RawText = document.RootElement.GetRawText();
 

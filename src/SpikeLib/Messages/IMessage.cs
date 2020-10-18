@@ -1,10 +1,6 @@
 ﻿using SpikeLib.Responses;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace SpikeLib.Messages
 {
@@ -12,6 +8,11 @@ namespace SpikeLib.Messages
     {
         public static IMessage? ParseMessage(JsonDocument document)
         {
+            if (document == null)
+            {
+                throw new ArgumentNullException(nameof(document));
+            }
+
             if (document.RootElement.TryGetProperty(stackalloc byte[] { (byte)'m' }, out var methodProperty))
             {
                 if (methodProperty.ValueKind == JsonValueKind.Number)

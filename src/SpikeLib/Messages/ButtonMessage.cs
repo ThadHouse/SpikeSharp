@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace SpikeLib.Messages
 {
@@ -15,6 +11,11 @@ namespace SpikeLib.Messages
 
         public ButtonMessage(JsonDocument document)
         {
+            if (document == null)
+            {
+                throw new ArgumentNullException(nameof(document));
+            }
+
             RawText = document.RootElement.GetRawText();
         }
     }

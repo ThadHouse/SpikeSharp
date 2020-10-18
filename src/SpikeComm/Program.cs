@@ -2,8 +2,6 @@
 using SpikeLib.Messages;
 using System;
 using System.IO;
-using System.IO.Ports;
-using System.Management;
 using System.Threading.Tasks;
 
 namespace SpikeComm

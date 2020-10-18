@@ -1,17 +1,12 @@
-﻿using Microsoft.VisualStudio.Threading;
-using Newtonsoft.Json;
-using SpikeLib.Messages;
+﻿using SpikeLib.Messages;
 using SpikeLib.Responses;
-using StreamJsonRpc;
 using System;
 using System.Buffers;
 using System.IO;
 using System.IO.Pipelines;
 using System.IO.Ports;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -19,7 +14,7 @@ using System.Threading.Tasks;
 namespace SpikeLib
 {
 
-    public class SpikeHub
+    public class SpikeHub : IDisposable
     {
         public string Port { get; }
         private readonly SerialPort serialPort;
@@ -95,7 +90,7 @@ namespace SpikeLib
                 if (readBytes < 0)
                 {
                     await pipe.CompleteAsync();
-                } 
+                }
                 pipe.Advance(readBytes);
                 await pipe.FlushAsync(token);
             }
@@ -132,11 +127,12 @@ namespace SpikeLib
                             await HandleMessageAsync(parsedMessage, token);
                         }
 
-                        
+
                     }
-                    catch (Exception ex)
+#pragma warning disable CA1031 // Do not catch general exception types
+                    catch (Exception)
+#pragma warning restore CA1031 // Do not catch general exception types
                     {
-                        ;
                         // TODO handle parsing exception
                     }
                     buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
@@ -196,6 +192,10 @@ namespace SpikeLib
 
         public async Task<bool> UploadFileAsync(Stream fileToUpload, int slot, string name, CancellationToken cancellationToken = default)
         {
+            if (fileToUpload == null)
+            {
+                throw new ArgumentNullException(nameof(fileToUpload));
+            }
 
             using var postStream = new MemoryStream();
             {
@@ -227,7 +227,7 @@ namespace SpikeLib
             postStream.Seek(0, SeekOrigin.Begin);
             await postStream.CopyToAsync(serialPort.BaseStream, cancellationToken);
 
-            var readValue = await programWriteChannel.Reader.ReadAsync();
+            var readValue = await programWriteChannel.Reader.ReadAsync(cancellationToken);
 
             var startResponse = (StartWriteProgramResponse)readValue;
 
@@ -259,7 +259,7 @@ namespace SpikeLib
                 postStream.Seek(0, SeekOrigin.Begin);
                 await postStream.CopyToAsync(serialPort.BaseStream, cancellationToken);
 
-                var readWriteResponse = await programWriteChannel.Reader.ReadAsync();
+                var readWriteResponse = await programWriteChannel.Reader.ReadAsync(cancellationToken);
                 ;
 
             }
@@ -267,6 +267,12 @@ namespace SpikeLib
             ;
 
             return true;
+        }
+
+        public void Dispose()
+        {
+            serialPort?.Dispose();
+            tokenSource?.Dispose();
         }
     }
 }

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace SpikeLib.Messages
 {
@@ -34,7 +30,7 @@ namespace SpikeLib.Messages
         K
     }
 
-    public readonly struct PortStatus
+    public readonly struct PortStatus : IEquatable<PortStatus>
     {
         public PortType Type { get; }
         private readonly int value0, value1, value2, value3, value4;
@@ -93,9 +89,39 @@ namespace SpikeLib.Messages
             }
             return (ColorValue)value1;
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is PortStatus status && Equals(status);
+        }
+
+        public bool Equals(PortStatus other)
+        {
+            return Type == other.Type &&
+                   value0 == other.value0 &&
+                   value1 == other.value1 &&
+                   value2 == other.value2 &&
+                   value3 == other.value3 &&
+                   value4 == other.value4;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Type, value0, value1, value2, value3, value4);
+        }
+
+        public static bool operator ==(PortStatus left, PortStatus right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(PortStatus left, PortStatus right)
+        {
+            return !(left == right);
+        }
     }
 
-    public readonly struct DirectionSet
+    public readonly struct DirectionSet : IEquatable<DirectionSet>
     {
         public int X { get; }
         public int Y { get; }
@@ -111,6 +137,33 @@ namespace SpikeLib.Messages
             X = elements[0].GetInt32();
             Y = elements[1].GetInt32();
             Z = elements[2].GetInt32();
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is DirectionSet set && Equals(set);
+        }
+
+        public bool Equals(DirectionSet other)
+        {
+            return X == other.X &&
+                   Y == other.Y &&
+                   Z == other.Z;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(X, Y, Z);
+        }
+
+        public static bool operator ==(DirectionSet left, DirectionSet right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(DirectionSet left, DirectionSet right)
+        {
+            return !(left == right);
         }
     }
     
@@ -131,6 +184,11 @@ namespace SpikeLib.Messages
 
         public PortStatusMessage(JsonDocument document)
         {
+            if (document == null)
+            {
+                throw new ArgumentNullException(nameof(document));
+            }
+
             RawText = document.RootElement.GetRawText();
             // Medium Motor : 75  [Rate, Angle, Absoulte Postition, fault?]
             // Light Sensor: 61 [reflectivity, color (or null), r, g, b]

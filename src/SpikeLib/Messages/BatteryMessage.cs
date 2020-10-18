@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace SpikeLib.Messages
 {
@@ -16,6 +12,11 @@ namespace SpikeLib.Messages
 
         public BatteryMessage(JsonDocument document)
         {
+            if (document == null)
+            {
+                throw new ArgumentNullException(nameof(document));
+            }
+
             RawText = document.RootElement.GetRawText();
             var properties = document.RootElement.GetProperty(stackalloc byte[] { (byte)'p' });
 
