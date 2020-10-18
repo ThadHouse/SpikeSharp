@@ -27,7 +27,6 @@ namespace SpikeLib
 
         public ChannelReader<IMessage> UnknownMessagesReader => unknownMessagesChannel.Reader;
         public ChannelReader<IConsoleMessage> ConsoleMessagesReader => consoleMessagesChannel.Reader;
-
         public ChannelReader<IStatusMessage> StatusMessageReader => statusMessageChannel.Reader;
 
         public SpikeHub(string comPort)
@@ -126,8 +125,6 @@ namespace SpikeLib
                         {
                             await HandleMessageAsync(parsedMessage, token);
                         }
-
-
                     }
 #pragma warning disable CA1031 // Do not catch general exception types
                     catch (Exception)
@@ -161,6 +158,10 @@ namespace SpikeLib
             else if (message is WritePackageResponse writePackage)
             {
                 await programWriteChannel.Writer.WriteAsync(writePackage, token);
+            }
+            else if (message is IStatusMessage statusMessage)
+            {
+                await statusMessageChannel.Writer.WriteAsync(statusMessage, token);
             }
             else
             {
