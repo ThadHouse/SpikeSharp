@@ -14,8 +14,11 @@ namespace SpikeLib.Messages
 
         public bool IsError => true;
 
+        public string RawText { get; }
+
         public UserProgramErrorMessage(JsonDocument document)
         {
+            RawText = document.RootElement.GetRawText();
             var properties = document.RootElement.GetProperty(stackalloc byte[] { (byte)'p' });
 
             var str = properties[3].GetString()!;

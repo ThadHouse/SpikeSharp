@@ -13,9 +13,12 @@ namespace SpikeLib.Responses
 
         public string MessageData { get; }
 
+        public string RawText { get; }
+
         public WritePackageResponse(string id, JsonDocument document)
         {
             Id = id;
+            RawText = document.RootElement.GetRawText();
 
             MessageData = document.RootElement.GetRawText();
         }

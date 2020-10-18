@@ -127,8 +127,11 @@ namespace SpikeLib.Messages
         public DirectionSet GyroRates { get; }
         public DirectionSet GyroAngles { get; }
 
+        public string RawText { get; }
+
         public PortStatusMessage(JsonDocument document)
         {
+            RawText = document.RootElement.GetRawText();
             // Medium Motor : 75  [Rate, Angle, Absoulte Postition, fault?]
             // Light Sensor: 61 [reflectivity, color (or null), r, g, b]
             // Ultrasonic : 62 [cm (or null)]

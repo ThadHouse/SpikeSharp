@@ -14,9 +14,12 @@ namespace SpikeLib.Responses
         public int  BlockSize { get; }
         public string TransferId { get; }
 
+        public string RawText { get; }
+
         public StartWriteProgramResponse(string id, JsonDocument document)
         {
             Id = id;
+            RawText = document.RootElement.GetRawText();
 
             var properties = document.RootElement.GetProperty(stackalloc byte[] { (byte)'r' });
 

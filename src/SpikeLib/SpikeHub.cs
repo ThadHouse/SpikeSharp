@@ -28,9 +28,12 @@ namespace SpikeLib
         private readonly Channel<StorageResponse> storageResponseChannel;
         private readonly Channel<IConsoleMessage> consoleMessagesChannel;
         private readonly Channel<IResponse> programWriteChannel;
+        private readonly Channel<IStatusMessage> statusMessageChannel;
 
         public ChannelReader<IMessage> UnknownMessagesReader => unknownMessagesChannel.Reader;
         public ChannelReader<IConsoleMessage> ConsoleMessagesReader => consoleMessagesChannel.Reader;
+
+        public ChannelReader<IStatusMessage> StatusMessageReader => statusMessageChannel.Reader;
 
         public SpikeHub(string comPort)
         {
@@ -40,6 +43,7 @@ namespace SpikeLib
             storageResponseChannel = Channel.CreateUnbounded<StorageResponse>();
             consoleMessagesChannel = Channel.CreateUnbounded<IConsoleMessage>();
             programWriteChannel = Channel.CreateUnbounded<IResponse>();
+            statusMessageChannel = Channel.CreateUnbounded<IStatusMessage>();
         }
 
         CancellationTokenSource tokenSource = new CancellationTokenSource();
@@ -145,6 +149,7 @@ namespace SpikeLib
             storageResponseChannel.Writer.Complete();
             consoleMessagesChannel.Writer.Complete();
             programWriteChannel.Writer.Complete();
+            statusMessageChannel.Writer.Complete();
         }
 
         private async ValueTask HandleMessageAsync(IMessage message, CancellationToken token)

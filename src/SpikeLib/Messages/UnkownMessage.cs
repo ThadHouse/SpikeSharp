@@ -2,22 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace SpikeLib.Messages
 {
     public class UnknownMessage : IMessage
     {
-        private readonly string rawMessage;
+        public string RawText { get; }
 
-        public UnknownMessage(string rawMessage)
+        public UnknownMessage(JsonDocument document)
         {
-            this.rawMessage = rawMessage;
-        }
-
-        public override string ToString()
-        {
-            return rawMessage;
+            RawText = document.RootElement.GetRawText();
         }
     }
 }

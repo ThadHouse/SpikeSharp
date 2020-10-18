@@ -12,8 +12,11 @@ namespace SpikeLib.Messages
         public bool Started { get; }
         public string ProgramName { get; }
 
+        public string RawText { get; }
+
         public ProgramStateChangedMessage(JsonDocument document)
         {
+            RawText = document.RootElement.GetRawText();
             var properties = document.RootElement.GetProperty(stackalloc byte[] { (byte)'p' });
 
             Started = properties[1].GetBoolean();

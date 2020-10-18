@@ -58,7 +58,7 @@ namespace SpikeLib.Messages
                         return new UserProgramPrintMessage(document);
                     }
                 }
-                return new UnknownMessage(document.RootElement.GetRawText());
+                return new UnknownMessage(document);
             }
             else if (document.RootElement.TryGetProperty(stackalloc byte[] { (byte) 'i'}, out var idProperty))
             {
@@ -73,12 +73,14 @@ namespace SpikeLib.Messages
                     case '2':
                         return new WritePackageResponse(idVal, document);
                 }
-                return new UnknownMessage(document.RootElement.GetRawText());
+                return new UnknownMessage(document);
             }
             else
             {
                 return null;
             }
         }
+
+        string RawText { get; }
     }
 }

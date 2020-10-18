@@ -12,8 +12,11 @@ namespace SpikeLib.Messages
         public int Percentage { get; }
         public float Voltage { get; }
 
+        public string RawText { get; }
+
         public BatteryMessage(JsonDocument document)
         {
+            RawText = document.RootElement.GetRawText();
             var properties = document.RootElement.GetProperty(stackalloc byte[] { (byte)'p' });
 
             Voltage = properties[0].GetSingle();
