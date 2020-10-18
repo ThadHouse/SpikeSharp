@@ -1,11 +1,14 @@
 ﻿using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json;
 using SpikeLib.Messages;
+using SpikeLib.Requests;
 using StreamJsonRpc;
 using System;
 using System.Buffers;
+using System.IO;
 using System.IO.Pipelines;
 using System.IO.Ports;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -121,6 +124,28 @@ namespace SpikeLib
                     return toRet;
                 }
             }
+        }
+
+        public async Task<string> WriteRequest(IRequest request)
+        {
+            string randomString;
+            using var stream = new MemoryStream();
+            {
+                using var writer = new Utf8JsonWriter(stream);
+                writer.WriteStartObject();
+                char baseId = request.WriteJson(writer);
+
+                randomString = baseId + "abc";
+
+                writer.WriteString("i", randomString);
+                writer.WriteEndObject();
+            }
+            stream.WriteByte(13);
+            stream.Seek(0, SeekOrigin.Begin);
+            await stream.CopyToAsync(serialPort.BaseStream);
+
+
+            return randomString;
         }
     }
 }

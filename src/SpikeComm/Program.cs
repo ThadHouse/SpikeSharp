@@ -1,5 +1,6 @@
 ﻿using SpikeLib;
 using SpikeLib.Messages;
+using SpikeLib.Requests;
 using System;
 using System.IO.Ports;
 using System.Management;
@@ -27,9 +28,12 @@ namespace SpikeComm
             //}
             //;
 
-            SpikeHub hub = new SpikeHub("COM8");
+            SpikeHub hub = new SpikeHub("COM5");
             await hub.OpenAsync();
-            
+
+           // await Task.Delay(1000);
+
+            await hub.WriteRequest(new ListPrograms());
 
 
             while (true)
