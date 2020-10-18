@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SpikeLib.Messages
 {
-    public class BatteryMessage : IMessage
+    public class BatteryMessage : IStatusMessage
     {
         public int Percentage { get; }
         public float Voltage { get; }

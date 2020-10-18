@@ -19,7 +19,7 @@ namespace SpikeLib.Messages
         DoubleTapped,
         Shake
     }
-    public class GestureMessage
+    public class GestureMessage : IStatusMessage
     {
     }
 }

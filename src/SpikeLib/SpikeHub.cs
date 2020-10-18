@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json;
 using SpikeLib.Messages;
-using SpikeLib.Requests;
+using SpikeLib.Responses;
 using StreamJsonRpc;
 using System;
 using System.Buffers;
@@ -13,6 +13,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace SpikeLib
@@ -23,18 +24,29 @@ namespace SpikeLib
         public string Port { get; }
         private readonly SerialPort serialPort;
         private readonly Pipe dataPipe = new Pipe();
-        CancellationTokenSource tokenSource = new CancellationTokenSource();
+        private readonly Channel<IMessage> unknownMessagesChannel;
+        private readonly Channel<StorageResponse> storageResponseChannel;
+        private readonly Channel<IConsoleMessage> consoleMessagesChannel;
+
+        public ChannelReader<IMessage> UnknownMessagesReader => unknownMessagesChannel.Reader;
+        public ChannelReader<IConsoleMessage> ConsoleMessagesReader => consoleMessagesChannel.Reader;
 
         public SpikeHub(string comPort)
         {
             Port = comPort;
             serialPort = new SerialPort(comPort, 115200);
+            unknownMessagesChannel = Channel.CreateUnbounded<IMessage>();
+            storageResponseChannel = Channel.CreateUnbounded<StorageResponse>();
+            consoleMessagesChannel = Channel.CreateUnbounded<IConsoleMessage>();
         }
 
-        private Task? RunLoop;
+        CancellationTokenSource tokenSource = new CancellationTokenSource();
+        private Task? SerialReadLoopLoop;
+        private Task? PipelineReadLoop;
 
         public async Task OpenAsync()
         {
+            if (serialPort.IsOpen) return;
             await Task.Run(() =>
             {
                 serialPort.RtsEnable = true;
@@ -44,17 +56,23 @@ namespace SpikeLib
                 serialPort.DtrEnable = true;
                 serialPort.Open();
                 tokenSource = new CancellationTokenSource();
-                RunLoop = Task.Run(() => ThreadMainAsync());
+                SerialReadLoopLoop = Task.Run(() => ThreadMainAsync());
+                PipelineReadLoop = Task.Run(() => PipelineTaskMainAsync());
             });
         }
 
         public async Task CloseAsync()
         {
             tokenSource.Cancel();
-            if (RunLoop != null)
+            if (SerialReadLoopLoop != null)
             {
-                await RunLoop;
-                RunLoop = null;
+                await SerialReadLoopLoop;
+                SerialReadLoopLoop = null;
+            }
+            if (PipelineReadLoop != null)
+            {
+                await PipelineReadLoop;
+                PipelineReadLoop = null;
             }
         }
 
@@ -75,77 +93,89 @@ namespace SpikeLib
                 pipe.Advance(readBytes);
                 await pipe.FlushAsync(token);
             }
+            await pipe.CompleteAsync();
             serialPort.Close();
         }
 
-        
-
-        bool isFirstLine = true;
-
-        public async Task<IMessage> ReadMessageAsync()
+        private async Task PipelineTaskMainAsync()
         {
-
             var reader = dataPipe.Reader;
-            IMessage? toRet = null;
-            while (true)
+            var token = tokenSource.Token;
+            while (!token.IsCancellationRequested)
             {
-                ReadResult result = await reader.ReadAsync();
+                ReadResult result = await reader.ReadAsync(token);
+                if (result.IsCanceled || result.IsCompleted)
+                {
+                    break;
+                }
 
-                ReadOnlySequence<byte> buffer = result.Buffer;
-                SequencePosition? position = null;
+                var buffer = result.Buffer;
 
-
-                // Look for a EOL in the buffer
-                position = buffer.PositionOf((byte)'\r');
+                var position = buffer.PositionOf<byte>(13);
 
                 if (position != null)
                 {
-                    // Process the line
-                    ReadOnlySequence<byte> line = buffer.Slice(0, position.Value);
-                    if (isFirstLine)
+                    try
                     {
-                        isFirstLine = false;
-                    }
-                    else
-                    {
-                        using var document = JsonDocument.Parse(line);
-                        toRet = IMessage.ParseMessage(document);
-                    }
+                        ReadOnlySequence<byte> line = buffer.Slice(0, position.Value);
 
-                    // Skip the line + the \n character (basically position)
+                        using var document = JsonDocument.Parse(line);
+                        var parsedMessage = IMessage.ParseMessage(document);
+                        if (parsedMessage != null)
+                        {
+                            await HandleMessageAsync(parsedMessage, token);
+                        }
+
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        // TODO handle parsing exception
+                    }
                     buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
                 }
 
-                // Tell the PipeReader how much of the buffer we have consumed
                 reader.AdvanceTo(buffer.Start, buffer.End);
 
-                if (toRet != null)
-                {
-                    return toRet;
-                }
+            }
+            unknownMessagesChannel.Writer.Complete();
+            storageResponseChannel.Writer.Complete();
+            consoleMessagesChannel.Writer.Complete();
+        }
+
+        private async ValueTask HandleMessageAsync(IMessage message, CancellationToken token)
+        {
+            if (message is StorageResponse storage)
+            {
+                await storageResponseChannel.Writer.WriteAsync(storage, token);
+            }
+            else
+            {
+                await unknownMessagesChannel.Writer.WriteAsync(message, token);
             }
         }
 
-        public async Task<string> WriteRequest(IRequest request)
+        public async Task<StorageResponse> RequestStorageAsync(CancellationToken cancellationToken = default)
         {
             string randomString;
             using var stream = new MemoryStream();
             {
                 using var writer = new Utf8JsonWriter(stream);
                 writer.WriteStartObject();
-                char baseId = request.WriteJson(writer);
+                writer.WriteString("m", "get_storage_status");
+                writer.WriteStartObject("p");
+                writer.WriteEndObject();
 
-                randomString = baseId + "abc";
+                randomString = "0abc";
 
                 writer.WriteString("i", randomString);
                 writer.WriteEndObject();
             }
             stream.WriteByte(13);
             stream.Seek(0, SeekOrigin.Begin);
-            await stream.CopyToAsync(serialPort.BaseStream);
+            await stream.CopyToAsync(serialPort.BaseStream, cancellationToken);
 
-
-            return randomString;
+            return await storageResponseChannel.Reader.ReadAsync(cancellationToken);
         }
     }
 }

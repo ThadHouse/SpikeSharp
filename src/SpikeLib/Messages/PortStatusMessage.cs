@@ -114,7 +114,7 @@ namespace SpikeLib.Messages
         }
     }
     
-    public class PortStatusMessage : IMessage
+    public class PortStatusMessage : IStatusMessage
     {
         public PortStatus PortA { get; }
         public PortStatus PortB { get; }

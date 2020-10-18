@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 
 namespace SpikeLib.Messages
 {
-    public class UserProgramErrorMessage : IMessage
+    public class UserProgramErrorMessage : IConsoleMessage
     {
         public string Backtrace { get; }
         public string CodeLocation { get; }
+
+        public bool IsError => true;
 
         public UserProgramErrorMessage(JsonDocument document)
         {

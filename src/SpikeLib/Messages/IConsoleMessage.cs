@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace SpikeLib.Messages
 {
-    public class ButtonMessage : IStatusMessage
+    public interface IConsoleMessage : IMessage
     {
-        // left, center, right, connect
-        // ["button", 0 for initial press, positive on release, press length]
+        bool IsError { get; }
     }
 }

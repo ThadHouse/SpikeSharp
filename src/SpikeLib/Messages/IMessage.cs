@@ -50,6 +50,10 @@ namespace SpikeLib.Messages
                     {
                         return new UserProgramErrorMessage(document);
                     }
+                    else if (methodStr == "userProgram.print")
+                    {
+                        return new UserProgramPrintMessage(document);
+                    }
                 }
                 return new UnknownMessage(document.RootElement.GetRawText());
             }

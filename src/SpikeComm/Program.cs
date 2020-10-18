@@ -1,6 +1,5 @@
 ﻿using SpikeLib;
 using SpikeLib.Messages;
-using SpikeLib.Requests;
 using System;
 using System.IO.Ports;
 using System.Management;
@@ -28,21 +27,19 @@ namespace SpikeComm
             //}
             //;
 
-            SpikeHub hub = new SpikeHub("COM8");
+            SpikeHub hub = new SpikeHub("COM5");
             await hub.OpenAsync();
 
-           // await Task.Delay(1000);
+            // await Task.Delay(1000);
 
-            await hub.WriteRequest(new ListPrograms());
+            var storage = await hub.RequestStorageAsync();
+            Console.WriteLine(storage);
 
+            var reader = hub.UnknownMessagesReader;
 
             while (true)
             {
-                var val = await hub.ReadMessageAsync();
-                if (val == null)
-                {
-                    return;
-                }
+                var val = await reader.ReadAsync();
                 if (val is BatteryMessage || val is PortStatusMessage) continue;
                 Console.WriteLine(val);
                 ;
