@@ -28,7 +28,7 @@ namespace SpikeComm
             //}
             //;
 
-            SpikeHub hub = new SpikeHub("COM5");
+            SpikeHub hub = new SpikeHub("COM8");
             await hub.OpenAsync();
 
            // await Task.Delay(1000);

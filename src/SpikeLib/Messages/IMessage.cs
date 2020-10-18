@@ -1,4 +1,4 @@
-﻿using SpikeLib.Responces;
+﻿using SpikeLib.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,11 +55,12 @@ namespace SpikeLib.Messages
             }
             else if (document.RootElement.TryGetProperty(stackalloc byte[] { (byte) 'i'}, out var idProperty))
             {
-                char idChar = idProperty.GetString()![0];
+                var idVal = idProperty.GetString()!;
+                char idChar = idVal[0];
                 switch (idChar)
                 {
                     case '0':
-                        return new StorageResponse(document);
+                        return new StorageResponse(idVal, document);
                 }
                 return new UnknownMessage(document.RootElement.GetRawText());
             }
