@@ -6,7 +6,10 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="SpikeApp.MainWindow"
         Title="SpikeApp">
-  <StackPanel>
-    <ctls:SpikePortControl></ctls:SpikePortControl>
-  </StackPanel>
+  <Grid ColumnDefinitions="20*, 80*, 250">
+    <ctls:ConsoleControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Column="1"></ctls:ConsoleControl>
+    <StackPanel HorizontalAlignment="Stretch"  Grid.Column="2">
+      <ctls:SpikePortControl></ctls:SpikePortControl>
+    </StackPanel>
+  </Grid>
 </Window>

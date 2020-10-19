@@ -5,13 +5,13 @@ using SpikeApp.Controls.ViewModels;
 
 namespace SpikeApp.Controls.Views
 {
-    public class SpikePortControl : UserControl
+    public class ConsoleControl : UserControl
     {
-        public SpikePortControl()
+        public ConsoleControl()
         {
             this.InitializeComponent();
 
-            DataContext = ViewModelStorage.SpikePortViewModel;
+            DataContext = ViewModelStorage.ConsoleViewModel;
         }
 
         private void InitializeComponent()

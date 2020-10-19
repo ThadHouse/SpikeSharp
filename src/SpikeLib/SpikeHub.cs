@@ -84,14 +84,21 @@ namespace SpikeLib
             var pipe = dataPipe.Writer;
             while (!token.IsCancellationRequested)
             {
-                var memory = pipe.GetMemory(2048);
-                int readBytes = await stream.ReadAsync(memory, token);
-                if (readBytes < 0)
+                try
                 {
-                    await pipe.CompleteAsync();
+                    var memory = pipe.GetMemory(2048);
+                    int readBytes = await stream.ReadAsync(memory, token);
+                    if (readBytes < 0)
+                    {
+                        await pipe.CompleteAsync();
+                    }
+                    pipe.Advance(readBytes);
+                    await pipe.FlushAsync(token);
                 }
-                pipe.Advance(readBytes);
-                await pipe.FlushAsync(token);
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
             }
             await pipe.CompleteAsync();
             serialPort.Close();
@@ -103,40 +110,46 @@ namespace SpikeLib
             var token = tokenSource.Token;
             while (!token.IsCancellationRequested)
             {
-                ReadResult result = await reader.ReadAsync(token);
-                if (result.IsCanceled || result.IsCompleted)
+                try
+                {
+                    ReadResult result = await reader.ReadAsync(token);
+                    if (result.IsCanceled || result.IsCompleted)
+                    {
+                        break;
+                    }
+
+                    var buffer = result.Buffer;
+
+                    var position = buffer.PositionOf<byte>(13);
+
+                    if (position != null)
+                    {
+                        try
+                        {
+                            ReadOnlySequence<byte> line = buffer.Slice(0, position.Value);
+
+                            using var document = JsonDocument.Parse(line);
+                            var parsedMessage = IMessage.ParseMessage(document);
+                            if (parsedMessage != null)
+                            {
+                                await HandleMessageAsync(parsedMessage, token);
+                            }
+                        }
+#pragma warning disable CA1031 // Do not catch general exception types
+                        catch (Exception)
+#pragma warning restore CA1031 // Do not catch general exception types
+                        {
+                            // TODO handle parsing exception
+                        }
+                        buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
+                    }
+
+                    reader.AdvanceTo(buffer.Start, buffer.End);
+                }
+                catch (OperationCanceledException)
                 {
                     break;
                 }
-
-                var buffer = result.Buffer;
-
-                var position = buffer.PositionOf<byte>(13);
-
-                if (position != null)
-                {
-                    try
-                    {
-                        ReadOnlySequence<byte> line = buffer.Slice(0, position.Value);
-
-                        using var document = JsonDocument.Parse(line);
-                        var parsedMessage = IMessage.ParseMessage(document);
-                        if (parsedMessage != null)
-                        {
-                            await HandleMessageAsync(parsedMessage, token);
-                        }
-                    }
-#pragma warning disable CA1031 // Do not catch general exception types
-                    catch (Exception)
-#pragma warning restore CA1031 // Do not catch general exception types
-                    {
-                        // TODO handle parsing exception
-                    }
-                    buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
-                }
-
-                reader.AdvanceTo(buffer.Start, buffer.End);
-
             }
             unknownMessagesChannel.Writer.Complete();
             storageResponseChannel.Writer.Complete();
@@ -162,6 +175,10 @@ namespace SpikeLib
             else if (message is IStatusMessage statusMessage)
             {
                 await statusMessageChannel.Writer.WriteAsync(statusMessage, token);
+            }
+            else if (message is IConsoleMessage consoleMessage)
+            {
+                await consoleMessagesChannel.Writer.WriteAsync(consoleMessage, token);
             }
             else
             {
