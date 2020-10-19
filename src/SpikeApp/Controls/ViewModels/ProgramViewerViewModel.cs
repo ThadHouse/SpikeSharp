@@ -82,7 +82,7 @@ namespace SpikeApp.Controls.ViewModels
             }
         }
 
-        public void AddChannelReeader(ChannelReader<StorageResponse> reader)
+        public void AddChannelReader(ChannelReader<StorageResponse> reader)
         {
             channelReaderTask = ChannelReaderFuncAsync(reader);
         }

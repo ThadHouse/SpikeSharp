@@ -33,7 +33,7 @@ namespace SpikeApp.Controls.ViewModels
             }
         }
 
-        public void AddChannelReeader(ChannelReader<IConsoleMessage> reader)
+        public void AddChannelReader(ChannelReader<IConsoleMessage> reader)
         {
             channelReaderTask = ChannelReaderFuncAsync(reader);
         }

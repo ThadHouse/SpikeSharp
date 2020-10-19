@@ -11,6 +11,7 @@
     <ctls:ConsoleControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Column="1"></ctls:ConsoleControl>
     <StackPanel HorizontalAlignment="Stretch"  Grid.Column="2">
       <ctls:SpikePortControl></ctls:SpikePortControl>
+      <ctls:DeviceStatus></ctls:DeviceStatus>
     </StackPanel>
     <DockPanel Grid.Column="0" HorizontalAlignment="Stretch">
       <ctls:ProgramViewer></ctls:ProgramViewer>

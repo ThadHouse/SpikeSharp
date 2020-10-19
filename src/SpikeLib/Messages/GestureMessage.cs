@@ -20,6 +20,8 @@ namespace SpikeLib.Messages
     {
         public string RawText { get; }
 
+        public string Gesture { get; }
+
         public GestureMessage(JsonDocument document)
         {
             if (document == null)
@@ -28,6 +30,8 @@ namespace SpikeLib.Messages
             }
 
             RawText = document.RootElement.GetRawText();
+
+            Gesture = "TODO";
         }
     }
 }

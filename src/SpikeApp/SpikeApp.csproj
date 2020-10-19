@@ -28,6 +28,9 @@
     <Compile Update="Controls\Views\ProgramViewer.axaml.cs">
       <DependentUpon>ProgramViewer.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Controls\Views\DeviceStatus.axaml.cs">
+      <DependentUpon>DeviceStatus.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

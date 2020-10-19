@@ -3,14 +3,15 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using SpikeApp.Controls.ViewModels;
 
-namespace SpikeApp
+namespace SpikeApp.Controls.Views
 {
-    public class MainWindow : Window
+    public class DeviceStatus : UserControl
     {
-        public MainWindow()
+        public DeviceStatus()
         {
-            ViewModelStorage.MainWindow = this;
-            InitializeComponent();
+            this.InitializeComponent();
+
+            DataContext = ViewModelStorage.StatusViewModel;
         }
 
         private void InitializeComponent()
