@@ -5,7 +5,7 @@
         xmlns:ctls="clr-namespace:SpikeApp.Controls.Views;assembly=SpikeApp"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="SpikeApp.MainWindow"
-        Title="SpikeApp">
+        Title="Mindstorms Robotics Inventor - Spike Prime Controller">
   <Grid ColumnDefinitions="250, *, 250">
     <ctls:ConsoleControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Column="1"></ctls:ConsoleControl>
     <StackPanel HorizontalAlignment="Stretch"  Grid.Column="2">
