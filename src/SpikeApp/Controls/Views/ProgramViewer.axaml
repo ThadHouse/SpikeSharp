@@ -15,8 +15,9 @@
       <Button Grid.Column="1" Grid.Row="2" HorizontalAlignment="Stretch" Command="{Binding UploadFile}">Upload File</Button>
     </Grid>
     <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Center">Program List</TextBlock>
-    <ListBox Items="{Binding ProgramList}">
-      
-    </ListBox>
+    <ScrollViewer>
+      <ListBox Items="{Binding ProgramList}">
+      </ListBox>
+    </ScrollViewer>
   </DockPanel>
 </UserControl>
