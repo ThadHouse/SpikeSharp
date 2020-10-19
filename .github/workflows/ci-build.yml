@@ -25,5 +25,5 @@ jobs:
       run:  dotnet publish src\SpikeApp\SpikeApp.csproj  -c Release -r win-x64 /p:PublishSingleFile=true /p:PublishTrimmed=true /p:IncludeNativeLibrariesForSelfExtract=true
     - uses: actions/upload-artifact@v2
       with:
-        name: WindowsArchive
-        path: \src\SpikeApp\bin\Release\net5.0\win-x64\publish\SpikeApp.exe
+        name: Windows Executable
+        path: src\SpikeApp\bin\Release\net5.0\win-x64\publish\SpikeApp.exe
