@@ -1,0 +1,22 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="SpikeApp.Controls.Views.ProgramViewer">
+  <DockPanel>
+
+    <Grid HorizontalAlignment="Stretch" DockPanel.Dock="Bottom" ColumnDefinitions="50*, 50*" RowDefinitions="*, *, *">
+      <TextBlock Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">Slot</TextBlock>
+      <TextBlock Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center">Name</TextBlock>
+      <NumericUpDown Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" Minimum="0" Maximum="19" Increment="1" Value="{Binding Slot}"></NumericUpDown>
+      <TextBox Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" Text="{Binding Name}"></TextBox>
+      <Button Grid.Column="0" Grid.Row="2" HorizontalAlignment="Stretch" Command="{Binding Refresh}">Refresh</Button>
+      <Button Grid.Column="1" Grid.Row="2" HorizontalAlignment="Stretch" Command="{Binding UploadFile}">Upload File</Button>
+    </Grid>
+    <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Center">Program List</TextBlock>
+    <ListBox Items="{Binding ProgramList}">
+      
+    </ListBox>
+  </DockPanel>
+</UserControl>

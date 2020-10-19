@@ -19,4 +19,9 @@
   <ItemGroup>
     <ProjectReference Include="..\SpikeLib\SpikeLib.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Controls\Views\ProgramViewer.axaml.cs">
+      <DependentUpon>ProgramViewer.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

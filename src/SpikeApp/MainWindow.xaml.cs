@@ -1,6 +1,7 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using SpikeApp.Controls.ViewModels;
 
 namespace SpikeApp
 {
@@ -8,6 +9,7 @@ namespace SpikeApp
     {
         public MainWindow()
         {
+            ViewModelStorage.MainWindow = this;
             InitializeComponent();
         }
 

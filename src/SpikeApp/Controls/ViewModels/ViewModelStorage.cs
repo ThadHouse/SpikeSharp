@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using SpikeLib;
 
 namespace SpikeApp.Controls.ViewModels
@@ -11,8 +12,11 @@ namespace SpikeApp.Controls.ViewModels
     {
         public static readonly ConsoleControlViewModel ConsoleViewModel = new();
         public static readonly SpikePortControlViewModel SpikePortViewModel = new();
+        public static readonly ProgramViewerViewModel ProgramViewModel = new();
 
-        private static SpikeHub? Hub;
+        public static SpikeHub? Hub;
+
+        public static Window MainWindow = null!;
 
         public static async Task AddHubAsync(string comPort)
         {
@@ -24,6 +28,8 @@ namespace SpikeApp.Controls.ViewModels
             Hub = new SpikeHub(comPort);
             await Hub.OpenAsync();
             ConsoleViewModel.AddChannelReeader(Hub.ConsoleMessagesReader);
+            ProgramViewModel.AddChannelReeader(Hub.StorageUpdateReader);
+            await ProgramViewModel.RefreshAsync();
         }
 
         public static async Task CloseHubAsync()
@@ -32,6 +38,7 @@ namespace SpikeApp.Controls.ViewModels
 
             await Hub.CloseAsync();
             await ConsoleViewModel.RemoveChannelReaderAsync();
+            await ProgramViewModel.RemoveChannelReaderAsync();
             // Todo clear out readers
         }
     }

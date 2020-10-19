@@ -21,7 +21,7 @@ namespace SpikeLib.Messages
                     {
                         case 1:
                             // Storage response, replied upon successful file upload
-                            break;
+                            return new StorageResponse("STATUS", document);
                         case 0:
                             // Port Status
                             return new PortStatusMessage(document);

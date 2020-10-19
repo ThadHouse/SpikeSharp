@@ -24,10 +24,12 @@ namespace SpikeLib
         private readonly Channel<IConsoleMessage> consoleMessagesChannel;
         private readonly Channel<IResponse> programWriteChannel;
         private readonly Channel<IStatusMessage> statusMessageChannel;
+        private readonly Channel<StorageResponse> storageUpdateChannel;
 
         public ChannelReader<IMessage> UnknownMessagesReader => unknownMessagesChannel.Reader;
         public ChannelReader<IConsoleMessage> ConsoleMessagesReader => consoleMessagesChannel.Reader;
         public ChannelReader<IStatusMessage> StatusMessageReader => statusMessageChannel.Reader;
+        public ChannelReader<StorageResponse> StorageUpdateReader => storageUpdateChannel.Reader;
 
         public SpikeHub(string comPort)
         {
@@ -38,6 +40,7 @@ namespace SpikeLib
             consoleMessagesChannel = Channel.CreateUnbounded<IConsoleMessage>();
             programWriteChannel = Channel.CreateUnbounded<IResponse>();
             statusMessageChannel = Channel.CreateUnbounded<IStatusMessage>();
+            storageUpdateChannel = Channel.CreateUnbounded<StorageResponse>();
         }
 
         CancellationTokenSource tokenSource = new CancellationTokenSource();
@@ -156,13 +159,21 @@ namespace SpikeLib
             consoleMessagesChannel.Writer.Complete();
             programWriteChannel.Writer.Complete();
             statusMessageChannel.Writer.Complete();
+            storageUpdateChannel.Writer.Complete();
         }
 
         private async ValueTask HandleMessageAsync(IMessage message, CancellationToken token)
         {
             if (message is StorageResponse storage)
             {
-                await storageResponseChannel.Writer.WriteAsync(storage, token);
+                if (storage.Id == "STATUS")
+                {
+                    await storageUpdateChannel.Writer.WriteAsync(storage, token);
+                }
+                else
+                {
+                    await storageResponseChannel.Writer.WriteAsync(storage, token);
+                }
             }
             else if (message is StartWriteProgramResponse startResponse)
             {
@@ -282,7 +293,6 @@ namespace SpikeLib
 
             }
             while (fileToUpload.Position < fileToUpload.Length);
-            ;
 
             return true;
         }

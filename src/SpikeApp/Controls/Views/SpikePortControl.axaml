@@ -5,6 +5,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SpikeApp.Controls.Views.SpikePortControl">
   <StackPanel>
+    <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Center">Device Status</TextBlock>
     <ComboBox HorizontalAlignment="Stretch" Items="{Binding Devices, Mode=TwoWay}" SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"></ComboBox>
     <Grid
      ColumnDefinitions="50*, 50*"
