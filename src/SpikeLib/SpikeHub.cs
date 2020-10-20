@@ -89,14 +89,7 @@ namespace SpikeLib
             {
                 try
                 {
-                    var memory = pipe.GetMemory(2048);
-                    int readBytes = await stream.ReadAsync(memory, token);
-                    if (readBytes < 0)
-                    {
-                        await pipe.CompleteAsync();
-                    }
-                    pipe.Advance(readBytes);
-                    await pipe.FlushAsync(token);
+                    await stream.CopyToAsync(pipe, token);
                 }
                 catch (OperationCanceledException)
                 {
