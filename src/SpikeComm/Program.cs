@@ -146,21 +146,25 @@ namespace SpikeComm
 
         private static void Watcher_EnumerationCompleted(DeviceWatcher sender, object args)
         {
+            // watcher.Stop()
             ;
         }
 
         private static void Watcher_Stopped(DeviceWatcher sender, object args)
         {
+            // if watcher.Scanning watcher.Start()
             ;
         }
 
         private static void Watcher_Updated(DeviceWatcher sender, DeviceInformationUpdate args)
         {
+            // update if exists in dictionary
             ;
         }
 
         private static void Watcher_Removed(DeviceWatcher sender, DeviceInformationUpdate args)
         {
+            // remove from dictionary
             ;
         }
 
@@ -168,9 +172,12 @@ namespace SpikeComm
 
         private static async void Watcher_Added(DeviceWatcher sender, DeviceInformation args)
         {
+            // remove and add to dictionary
             try
             {
                 var item = await BluetoothDevice.FromIdAsync(args.Id);
+
+                args.Update()
 
                 var serialPort = (await item.GetRfcommServicesForIdAsync(RfcommServiceId.SerialPort)).Services.First();
                 StreamSocket sock = new StreamSocket();
