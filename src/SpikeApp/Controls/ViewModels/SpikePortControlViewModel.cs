@@ -36,13 +36,24 @@ namespace SpikeApp.Controls.ViewModels
             set => RaiseAndSetIfChanged(ref connectText, value);
         }
 
-        public void RefreshDevices()
+        public async void RefreshDevices()
         {
-            var allowedDevices = SerialPort.GetPortNames();
+            await RefreshDevicesAsync();
+        }
+
+        public async Task RefreshDevicesAsync()
+        {
+            var allowedDevices = await SerialSpikeConnection.EnumerateConnectedHubsAsync();
             Devices.Clear();
-            if (allowedDevices.Length == 0)
+            if (allowedDevices.Count == 0)
             {
                 Devices.Add("None");
+            }
+            else if (allowedDevices.Count == 1 && connectText == "Connect")
+            {
+                Devices.Add(allowedDevices[0]);
+                SelectedDevice = allowedDevices[0];
+                await ConnectAsync();
             }
             else
             {
@@ -56,10 +67,17 @@ namespace SpikeApp.Controls.ViewModels
 
         public async void Connect()
         {
+            await ConnectAsync();
+        }
+
+        public async Task ConnectAsync()
+        {
             if (connectText == "Connect")
             {
                 if (SelectedDevice == "None") return;
-                await ViewModelStorage.AddHubAsync(SelectedDevice);
+                var device = await SerialSpikeConnection.OpenConnectionAsync(SelectedDevice);
+                if (device == null) return;
+                await ViewModelStorage.AddHubAsync(device);
                 ConnectText = "Disconnect";
             }
             else

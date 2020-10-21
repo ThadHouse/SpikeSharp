@@ -70,9 +70,11 @@ namespace SpikeComm
             //// Start the watcher.
             //deviceWatcher.Start();
 
+            var devices = await SerialSpikeConnection.EnumerateConnectedHubsAsync();
+
             PipelineTaskMainAsync();
 
-            var watcher = DeviceInformation.CreateWatcher(BluetoothDevice.GetDeviceSelectorFromClassOfDevice(BluetoothClassOfDevice.FromParts((BluetoothMajorClass)8, (BluetoothMinorClass)1, (BluetoothServiceCapabilities)0)), new string[]
+            var watcher = DeviceInformation.CreateWatcher(BluetoothDevice.GetDeviceSelectorFromClassOfDevice(BluetoothClassOfDevice.FromParts(BluetoothMajorClass.Toy, BluetoothMinorClass.ToyRobot, BluetoothServiceCapabilities.None)), new string[]
               {
                 "System.ItemNameDisplay",
                 "System.Devices.Aep.IsConnected",
@@ -177,7 +179,7 @@ namespace SpikeComm
             {
                 var item = await BluetoothDevice.FromIdAsync(args.Id);
 
-                args.Update()
+                //item.
 
                 var serialPort = (await item.GetRfcommServicesForIdAsync(RfcommServiceId.SerialPort)).Services.First();
                 StreamSocket sock = new StreamSocket();

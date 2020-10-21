@@ -4,7 +4,6 @@ using System;
 using System.Buffers;
 using System.IO;
 using System.IO.Pipelines;
-using System.IO.Ports;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -16,8 +15,7 @@ namespace SpikeLib
 
     public class SpikeHub : IDisposable
     {
-        public string Port { get; }
-        private readonly SerialPort serialPort;
+        private readonly ISpikeConnection spikeConnection;
         private readonly Pipe dataPipe = new Pipe();
         private readonly Channel<IMessage> unknownMessagesChannel;
         private readonly Channel<StorageResponse> storageResponseChannel;
@@ -31,38 +29,23 @@ namespace SpikeLib
         public ChannelReader<IStatusMessage> StatusMessageReader => statusMessageChannel.Reader;
         public ChannelReader<StorageResponse> StorageUpdateReader => storageUpdateChannel.Reader;
 
-        public SpikeHub(string comPort)
+        public SpikeHub(ISpikeConnection spikeConnection)
         {
-            Port = comPort;
-            serialPort = new SerialPort(comPort, 115200);
+            this.spikeConnection = spikeConnection;
             unknownMessagesChannel = Channel.CreateUnbounded<IMessage>();
             storageResponseChannel = Channel.CreateUnbounded<StorageResponse>();
             consoleMessagesChannel = Channel.CreateUnbounded<IConsoleMessage>();
             programWriteChannel = Channel.CreateUnbounded<IResponse>();
             statusMessageChannel = Channel.CreateUnbounded<IStatusMessage>();
             storageUpdateChannel = Channel.CreateUnbounded<StorageResponse>();
+            tokenSource = new CancellationTokenSource();
+            SerialReadLoopLoop = Task.Run(() => ReadThreadMainAsync());
+            PipelineReadLoop = Task.Run(() => PipelineTaskMainAsync());
         }
 
         CancellationTokenSource tokenSource = new CancellationTokenSource();
         private Task? SerialReadLoopLoop;
         private Task? PipelineReadLoop;
-
-        public async Task OpenAsync()
-        {
-            if (serialPort.IsOpen) return;
-            await Task.Run(() =>
-            {
-                serialPort.RtsEnable = true;
-                serialPort.DataBits = 8;
-                serialPort.StopBits = StopBits.One;
-                serialPort.Parity = Parity.None;
-                serialPort.DtrEnable = true;
-                serialPort.Open();
-                tokenSource = new CancellationTokenSource();
-                SerialReadLoopLoop = Task.Run(() => ThreadMainAsync());
-                PipelineReadLoop = Task.Run(() => PipelineTaskMainAsync());
-            });
-        }
 
         public async Task CloseAsync()
         {
@@ -77,13 +60,13 @@ namespace SpikeLib
                 await PipelineReadLoop;
                 PipelineReadLoop = null;
             }
+            await spikeConnection.CloseAsync();
         }
 
-        private async Task ThreadMainAsync()
+        private async Task ReadThreadMainAsync()
         {
             var token = tokenSource.Token;
-            var stream = serialPort.BaseStream;
-            stream.ReadTimeout = 100;
+            var stream = spikeConnection.ReadStream;
             var pipe = dataPipe.Writer;
             while (!token.IsCancellationRequested)
             {
@@ -95,9 +78,15 @@ namespace SpikeLib
                 {
                     break;
                 }
+#pragma warning disable CA1031 // Do not catch general exception types
+                catch (Exception ex)
+#pragma warning restore CA1031 // Do not catch general exception types
+                {
+                    Console.WriteLine(ex);
+                    ;
+                }
             }
             await pipe.CompleteAsync();
-            serialPort.Close();
         }
 
         private async Task PipelineTaskMainAsync()
@@ -207,7 +196,7 @@ namespace SpikeLib
             }
             stream.WriteByte(13);
             stream.Seek(0, SeekOrigin.Begin);
-            await stream.CopyToAsync(serialPort.BaseStream, cancellationToken);
+            await stream.CopyToAsync(spikeConnection.WriteStream, cancellationToken);
 
             return await storageResponseChannel.Reader.ReadAsync(cancellationToken);
         }
@@ -247,7 +236,7 @@ namespace SpikeLib
 
             postStream.WriteByte(13);
             postStream.Seek(0, SeekOrigin.Begin);
-            await postStream.CopyToAsync(serialPort.BaseStream, cancellationToken);
+            await postStream.CopyToAsync(spikeConnection.WriteStream, cancellationToken);
 
             var readValue = await programWriteChannel.Reader.ReadAsync(cancellationToken);
 
@@ -279,7 +268,7 @@ namespace SpikeLib
 
                 postStream.WriteByte(13);
                 postStream.Seek(0, SeekOrigin.Begin);
-                await postStream.CopyToAsync(serialPort.BaseStream, cancellationToken);
+                await postStream.CopyToAsync(spikeConnection.WriteStream, cancellationToken);
 
                 var readWriteResponse = await programWriteChannel.Reader.ReadAsync(cancellationToken);
                 ;
@@ -292,7 +281,6 @@ namespace SpikeLib
 
         public void Dispose()
         {
-            serialPort?.Dispose();
             tokenSource?.Dispose();
         }
     }

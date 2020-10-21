@@ -19,15 +19,14 @@ namespace SpikeApp.Controls.ViewModels
 
         public static Window MainWindow = null!;
 
-        public static async Task AddHubAsync(string comPort)
+        public static async Task AddHubAsync(ISpikeConnection spikeConnection)
         {
             if (Hub != null)
             {
                 await CloseHubAsync();
             }
 
-            Hub = new SpikeHub(comPort);
-            await Hub.OpenAsync();
+            Hub = new SpikeHub(spikeConnection);
             ConsoleViewModel.AddChannelReader(Hub.ConsoleMessagesReader);
             ProgramViewModel.AddChannelReader(Hub.StorageUpdateReader);
             StatusViewModel.AddChannelReader(Hub.StatusMessageReader);
