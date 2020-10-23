@@ -13,43 +13,91 @@ using SharpGen.Runtime.Win32;
 using SpikeApp.Utilities;
 using SpikeLib;
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
 using Windows.Devices.SerialCommunication;
 using Windows.Devices.Usb;
+using Windows.Gaming.Input.ForceFeedback;
+using Windows.Networking.Sockets;
 
 namespace SpikeApp.Controls.ViewModels
 {
     public class SpikePortControlViewModel : ViewModelBase
     {
-        private class HubInfo
+        public class HubInfo
         {
             public DeviceInformation DeviceInfo { get; }
+
             public HubInfo(DeviceInformation info)
             {
                 DeviceInfo = info;
             }
+
+            public override string ToString()
+            {
+                return Name;
+            }
+
             public string Id => DeviceInfo.Id;
+            public string Name => DeviceInfo.Name;
+            public bool IsSerial => DeviceInfo.Kind == DeviceInformationKind.DeviceInterface;
+            public bool IsValid { get; set; }
         }
 
-        public ObservableCollection<string> Devices { get; } = new ObservableCollection<string>();
+        public ObservableCollection<HubInfo> Devices { get; } = new ObservableCollection<HubInfo>();
 
-        private readonly ConcurrentDictionary<string, HubInfo> connectedDeviceInfo = new();
         private readonly DeviceWatcher deviceWatcherSerial;
         private readonly DeviceWatcher deviceWatcherBluetooth;
         private readonly SynchronizationContext context;
         private readonly SendOrPostCallback sendOrPostCb;
 
+        private record UpdateWrapper(bool Removed, DeviceInformationUpdate Update);
+
+        private HubInfo? connectedDevice;
+
         private async void TriggerRefresh(object? o)
         {
             if (o is DeviceInformation devInfo)
             {
+                Devices.Add(new HubInfo(devInfo));
+                await RefreshAsync();
                 ;
             }
-            else if (o is DeviceInformationUpdate devInfoUpdate)
+            else if (o is UpdateWrapper updateWrapper)
             {
-                ;
+                if (updateWrapper.Removed)
+                {
+                    // Find device
+                    for (int i = 0; i < Devices.Count; i++)
+                    {
+                        if (Devices[i].Id == updateWrapper.Update.Id)
+                        {
+                            var device = Devices[i];
+                            Devices.RemoveAt(i);
+                            if (device == connectedDevice)
+                            {
+                                // Disconnect
+                                await DisconnectAsync();
+                            }
+                            // Refresh
+                            await RefreshAsync();
+
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var device in Devices)
+                    {
+                        if (device.Id == updateWrapper.Update.Id)
+                        {
+                            device.DeviceInfo.Update(updateWrapper.Update);
+                            break;
+                        }
+                    }
+                }
             }
-            ;
         }
 
         public SpikePortControlViewModel()
@@ -63,9 +111,12 @@ namespace SpikeApp.Controls.ViewModels
             "System.Devices.Aep.IsConnected",
             "System.Devices.Aep.DeviceAddress",
             "System.Devices.Aep.ProtocolId",
-            "System.Devices.Aep.SignalStrength"
+            "System.Devices.Aep.IsPresent",
+            "System.Devices.Aep.SignalStrength",
+            
+
             });
-            deviceWatcherSerial = DeviceInformation.CreateWatcher(SerialDevice.GetDeviceSelectorFromUsbVidPid(0x0694, 0x0010));
+            deviceWatcherSerial = DeviceInformation.CreateWatcher(SerialDevice.GetDeviceSelectorFromUsbVidPid(0x0694, 0x0010), new string[] { "System.DeviceInterface.Serial.PortName" });
 
             deviceWatcherSerial.Added += DeviceWatcher_Added;
             deviceWatcherSerial.Removed += DeviceWatcher_Removed;
@@ -96,20 +147,13 @@ namespace SpikeApp.Controls.ViewModels
 
         private void DeviceWatcher_Updated(DeviceWatcher sender, DeviceInformationUpdate args)
         {
-            var id = args.Id;
-            if (connectedDeviceInfo.TryGetValue(id, out var info))
-            {
-                info.DeviceInfo.Update(args);
-            }
+            context.Post(sendOrPostCb, new UpdateWrapper(false, args));
+            ;
         }
 
         private void DeviceWatcher_Removed(DeviceWatcher sender, DeviceInformationUpdate args)
         {
-            var id = args.Id;
-            if (connectedDeviceInfo.TryRemove(id, out var _))
-            {
-                context.Post(sendOrPostCb, args);
-            }
+            context.Post(sendOrPostCb, new UpdateWrapper(true, args));
         }
 
         private void DeviceWatcher_Added(DeviceWatcher sender, DeviceInformation args)
@@ -121,15 +165,12 @@ namespace SpikeApp.Controls.ViewModels
                     return;
                 }
             }
-            var id = args.Id;
-            connectedDeviceInfo.TryRemove(id, out var _);
-            connectedDeviceInfo.TryAdd(id, new HubInfo(args));
             context.Post(sendOrPostCb, args);
         }
 
-        private string selectedDevice = "None";
+        private HubInfo? selectedDevice;
             
-        public string SelectedDevice
+        public HubInfo? SelectedDevice
         {
             get => selectedDevice;
             set => RaiseAndSetIfChanged(ref selectedDevice, value);
@@ -143,80 +184,97 @@ namespace SpikeApp.Controls.ViewModels
             set => RaiseAndSetIfChanged(ref connectText, value);
         }
 
-        public async void RefreshDevices()
+        private bool isConnected;
+
+        public bool IsConnected
         {
-            await RefreshDevicesAsync();
+            get => isConnected;
+            set => RaiseAndSetIfChanged(ref isConnected, value);
         }
 
-        public async void RefreshBluetoothDevices()
+        public async Task ConnectAsync(HubInfo device)
         {
-            await RefreshBluetoothDevicesAsync();
-        }
-
-        public async Task RefreshBluetoothDevicesAsync()
-        {
-            
-            //var devices = await DeviceInformation.FindAllAsync(deviceClass, new string[]
-            //{
-            //"System.ItemNameDisplay",
-            //"System.Devices.Aep.IsConnected",
-            //"System.Devices.Aep.DeviceAddress",
-            //"System.Devices.Aep.ProtocolId",
-            //"System.Devices.Aep.SignalStrength"
-            //});
-            
-            //devices.Where(x => x.)
-        }
-
-        public async Task RefreshDevicesAsync()
-        {
-            var allowedDevices = await SerialSpikeConnection.EnumerateConnectedHubsAsync();
-            Devices.Clear();
-            if (allowedDevices.Count == 0)
+            if (device.IsSerial)
             {
-                Devices.Add("None");
-            }
-            else if (allowedDevices.Count == 1 && connectText == "Connect")
-            {
-                Devices.Add(allowedDevices[0]);
-                SelectedDevice = allowedDevices[0];
-                await ConnectAsync();
+                var props = device.DeviceInfo.Properties.ToArray();
+                foreach (var prop in props)
+                {
+                    if (prop.Key == "System.DeviceInterface.Serial.PortName")
+                    {
+                        var conn = await SerialSpikeConnection.OpenConnectionAsync((string)prop.Value);
+                        if (conn != null)
+                        {
+                            await ViewModelStorage.AddHubAsync(conn);
+                            connectedDevice = device;
+                            IsConnected = true;
+                            ConnectText = "Disconnect";
+                        }
+                        
+                    }
+                }
             }
             else
             {
-                foreach (var d in allowedDevices)
+                try
                 {
-                    Devices.Add(d);
+                    var btDevice = await BluetoothDevice.FromIdAsync(device.Id);
+
+                    var serialPort = (await btDevice.GetRfcommServicesForIdAsync(RfcommServiceId.SerialPort)).Services.First();
+                    StreamSocket streamSocket = new();
+                    await streamSocket.ConnectAsync(serialPort.ConnectionHostName, serialPort.ConnectionServiceName);
+
+                    var conn = new StreamSpikeConnection(streamSocket);
+
+                    await ViewModelStorage.AddHubAsync(conn);
+                    connectedDevice = device;
+                    IsConnected = true;
+                    ConnectText = "Disconnect";
                 }
-                SelectedDevice = allowedDevices[0];
+                catch (Exception ex)
+                {
+                    ;
+                }
             }
+            ;
+            //device.DeviceInfo.Properties[""]
+        }
+
+        public async Task RefreshAsync()
+        {
+            if (connectedDevice != null) return;
+
+            // Enumerate, see if we have a serial connection
+            foreach (var device in Devices)
+            {
+                if (device.IsSerial)
+                {
+                    SelectedDevice = device;
+                    await ConnectAsync(device);
+                    break;
+                }
+            }
+        }
+
+        public async Task DisconnectAsync()
+        {
+            if (connectedDevice == null) return;
+
+            await ViewModelStorage.CloseHubAsync();
+            connectedDevice = null;
+            IsConnected = false;
+            ConnectText = "Connect";
         }
 
         public async void Connect()
         {
-            await ConnectAsync();
-        }
-
-        public async Task ConnectAsync()
-        {
-            if (connectText == "Connect")
+            if (IsConnected)
             {
-                if (SelectedDevice == "None") return;
-                var device = await SerialSpikeConnection.OpenConnectionAsync(SelectedDevice);
-                if (device == null) return;
-                await ViewModelStorage.AddHubAsync(device);
-                ConnectText = "Disconnect";
+                await DisconnectAsync();
             }
-            else
+            else if (SelectedDevice != null)
             {
-                await ViewModelStorage.CloseHubAsync();
-                ConnectText = "Connect";
+                await ConnectAsync(SelectedDevice);
             }
-        }
-
-        public void ScanBluetooth()
-        {
-
         }
     }
 }

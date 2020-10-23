@@ -13,6 +13,7 @@ using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
+using Windows.Devices.SerialCommunication;
 using Windows.Networking.Sockets;
 
 namespace SpikeComm
@@ -69,6 +70,12 @@ namespace SpikeComm
 
             //// Start the watcher.
             //deviceWatcher.Start();
+
+            var ports = await DeviceInformation.FindAllAsync(SerialDevice.GetDeviceSelector(), new string[] { "System.DeviceInterface.Serial.PortName" });
+            foreach (var port in ports)
+            {
+                object o = port.Properties["System.DeviceInterface.Serial.PortName"];
+            }
 
             var devices = await SerialSpikeConnection.EnumerateConnectedHubsAsync();
 

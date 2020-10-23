@@ -109,9 +109,10 @@ namespace SpikeLib
 
                     if (position != null)
                     {
+                        ReadOnlySequence<byte> line = buffer.Slice(0, position.Value);
                         try
                         {
-                            ReadOnlySequence<byte> line = buffer.Slice(0, position.Value);
+                            
 
                             using var document = JsonDocument.Parse(line);
                             var parsedMessage = IMessage.ParseMessage(document);
@@ -121,9 +122,12 @@ namespace SpikeLib
                             }
                         }
 #pragma warning disable CA1031 // Do not catch general exception types
-                        catch (Exception)
+                        catch (Exception ex)
 #pragma warning restore CA1031 // Do not catch general exception types
                         {
+                            Console.WriteLine(Encoding.UTF8.GetString(line));
+                            Console.WriteLine(ex);
+                            ;
                             // TODO handle parsing exception
                         }
                         buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
@@ -197,6 +201,7 @@ namespace SpikeLib
             stream.WriteByte(13);
             stream.Seek(0, SeekOrigin.Begin);
             await stream.CopyToAsync(spikeConnection.WriteStream, cancellationToken);
+            await stream.FlushAsync(cancellationToken);
 
             return await storageResponseChannel.Reader.ReadAsync(cancellationToken);
         }
