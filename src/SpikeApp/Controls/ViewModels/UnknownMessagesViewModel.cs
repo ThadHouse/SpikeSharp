@@ -1,15 +1,14 @@
 ﻿using System.Threading.Channels;
 using System.Threading.Tasks;
-using SpikeApp.Controls.Windows;
 using SpikeApp.Utilities;
 using SpikeLib.Messages;
 
 namespace SpikeApp.Controls.ViewModels
 {
-    public class ConsoleControlViewModel : ViewModelBase
+    public class UnknownMessagesViewModel : ViewModelBase
     {
         private string consoleContents = "";
-        
+
         public string ConsoleLog
         {
             get => consoleContents;
@@ -18,14 +17,14 @@ namespace SpikeApp.Controls.ViewModels
 
         private Task? channelReaderTask;
 
-        private async Task ChannelReaderFuncAsync(ChannelReader<IConsoleMessage> reader)
+        private async Task ChannelReaderFuncAsync(ChannelReader<IMessage> reader)
         {
             while (true)
             {
                 try
                 {
                     var element = await reader.ReadAsync();
-                    ConsoleLog += $"{element.ToString()}\n";
+                    ConsoleLog += $"Type: {element.GetType()} RawMsg {element.RawText}\n";
                 }
                 catch (ChannelClosedException)
                 {
@@ -34,7 +33,7 @@ namespace SpikeApp.Controls.ViewModels
             }
         }
 
-        public void AddChannelReader(ChannelReader<IConsoleMessage> reader)
+        public void AddChannelReader(ChannelReader<IMessage> reader)
         {
             channelReaderTask = ChannelReaderFuncAsync(reader);
         }
@@ -51,11 +50,6 @@ namespace SpikeApp.Controls.ViewModels
         public void Clear()
         {
             ConsoleLog = "";
-        }
-
-        public void OpenUnknownWindow()
-        {
-            ViewModelStorage.StartUnknownWindow();
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using SpikeApp.Controls.Windows;
 using SpikeLib;
 
 namespace SpikeApp.Controls.ViewModels
@@ -14,6 +15,7 @@ namespace SpikeApp.Controls.ViewModels
         public static readonly SpikePortControlViewModel SpikePortViewModel = new();
         public static readonly ProgramViewerViewModel ProgramViewModel = new();
         public static readonly DeviceStatusViewModel StatusViewModel = new();
+        public static readonly UnknownMessagesViewModel UnknownViewModel = new();
 
         public static SpikeHub? Hub;
 
@@ -30,6 +32,7 @@ namespace SpikeApp.Controls.ViewModels
             ConsoleViewModel.AddChannelReader(Hub.ConsoleMessagesReader);
             ProgramViewModel.AddChannelReader(Hub.StorageUpdateReader);
             StatusViewModel.AddChannelReader(Hub.StatusMessageReader);
+            UnknownViewModel.AddChannelReader(Hub.UnknownMessagesReader);
             await Task.Delay(500);
             await ProgramViewModel.RefreshAsync();
         }
@@ -42,12 +45,30 @@ namespace SpikeApp.Controls.ViewModels
             await ConsoleViewModel.RemoveChannelReaderAsync();
             await ProgramViewModel.RemoveChannelReaderAsync();
             await StatusViewModel.RemoveChannelReaderAsync();
+            await UnknownViewModel.RemoveChannelReaderAsync();
             // Todo clear out readers
         }
 
         public static void SetPortViewerViewModel(PortViewerViewModel viewModel)
         {
             StatusViewModel.SetPortViewerViewModel(viewModel);
+        }
+
+        private static UnknownMessagesWindow? unknownWindow;
+
+        public static void StartUnknownWindow()
+        {
+            if (unknownWindow == null)
+            {
+                unknownWindow = new UnknownMessagesWindow();
+                unknownWindow.Closing += UnknownWindow_Closing;
+            }
+            unknownWindow.Show();
+        }
+
+        private static void UnknownWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            unknownWindow = null;
         }
     }
 }

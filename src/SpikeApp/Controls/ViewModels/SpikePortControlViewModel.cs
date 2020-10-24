@@ -105,17 +105,7 @@ namespace SpikeApp.Controls.ViewModels
             sendOrPostCb = TriggerRefresh;
             context = SynchronizationContext.Current!;
             var deviceClass = BluetoothDevice.GetDeviceSelectorFromClassOfDevice(BluetoothClassOfDevice.FromParts(BluetoothMajorClass.Toy, BluetoothMinorClass.ToyRobot, BluetoothServiceCapabilities.None));
-            deviceWatcherBluetooth = DeviceInformation.CreateWatcher(deviceClass, new string[]
-            {
-            "System.ItemNameDisplay",
-            "System.Devices.Aep.IsConnected",
-            "System.Devices.Aep.DeviceAddress",
-            "System.Devices.Aep.ProtocolId",
-            "System.Devices.Aep.IsPresent",
-            "System.Devices.Aep.SignalStrength",
-            
-
-            });
+            deviceWatcherBluetooth = DeviceInformation.CreateWatcher(deviceClass);
             deviceWatcherSerial = DeviceInformation.CreateWatcher(SerialDevice.GetDeviceSelectorFromUsbVidPid(0x0694, 0x0010), new string[] { "System.DeviceInterface.Serial.PortName" });
 
             deviceWatcherSerial.Added += DeviceWatcher_Added;
@@ -132,6 +122,13 @@ namespace SpikeApp.Controls.ViewModels
 
             deviceWatcherSerial.Start();
             deviceWatcherBluetooth.Start();
+        }
+
+        private bool canStartConnect = false;
+        public bool CanStartConnect
+        {
+            get => canStartConnect;
+            set => RaiseAndSetIfChanged(ref canStartConnect, value);
         }
 
         private void DeviceWatcher_EnumerationCompleted(DeviceWatcher sender, object args)
@@ -194,54 +191,64 @@ namespace SpikeApp.Controls.ViewModels
 
         public async Task ConnectAsync(HubInfo device)
         {
-            if (device.IsSerial)
+            try
             {
-                var props = device.DeviceInfo.Properties.ToArray();
-                foreach (var prop in props)
+                CanStartConnect = false;
+                if (device.IsSerial)
                 {
-                    if (prop.Key == "System.DeviceInterface.Serial.PortName")
+                    var props = device.DeviceInfo.Properties.ToArray();
+                    foreach (var prop in props)
                     {
-                        var conn = await SerialSpikeConnection.OpenConnectionAsync((string)prop.Value);
-                        if (conn != null)
+                        if (prop.Key == "System.DeviceInterface.Serial.PortName")
                         {
-                            await ViewModelStorage.AddHubAsync(conn);
-                            connectedDevice = device;
-                            IsConnected = true;
-                            ConnectText = "Disconnect";
+                            var conn = await SerialSpikeConnection.OpenConnectionAsync((string)prop.Value);
+                            if (conn != null)
+                            {
+                                await ViewModelStorage.AddHubAsync(conn);
+                                connectedDevice = device;
+                                IsConnected = true;
+                                ConnectText = "Disconnect";
+                            }
+
                         }
-                        
                     }
                 }
-            }
-            else
-            {
-                try
+                else
                 {
-                    var btDevice = await BluetoothDevice.FromIdAsync(device.Id);
+                    try
+                    {
+                        var btDevice = await BluetoothDevice.FromIdAsync(device.Id);
 
-                    var serialPort = (await btDevice.GetRfcommServicesForIdAsync(RfcommServiceId.SerialPort)).Services.First();
-                    StreamSocket streamSocket = new();
-                    await streamSocket.ConnectAsync(serialPort.ConnectionHostName, serialPort.ConnectionServiceName);
+                        var serialPort = (await btDevice.GetRfcommServicesForIdAsync(RfcommServiceId.SerialPort)).Services.First();
+                        StreamSocket streamSocket = new();
+                        await streamSocket.ConnectAsync(serialPort.ConnectionHostName, serialPort.ConnectionServiceName);
 
-                    var conn = new StreamSpikeConnection(streamSocket);
+                        var conn = new StreamSpikeConnection(streamSocket);
 
-                    await ViewModelStorage.AddHubAsync(conn);
-                    connectedDevice = device;
-                    IsConnected = true;
-                    ConnectText = "Disconnect";
+                        await ViewModelStorage.AddHubAsync(conn);
+                        connectedDevice = device;
+                        IsConnected = true;
+                        ConnectText = "Disconnect";
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex);
+                        ;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    ;
-                }
-            }
             ;
-            //device.DeviceInfo.Properties[""]
+            }
+            finally
+            {
+                CanStartConnect = true;
+            }
         }
 
         public async Task RefreshAsync()
         {
             if (connectedDevice != null) return;
+
+
 
             // Enumerate, see if we have a serial connection
             foreach (var device in Devices)
@@ -253,22 +260,44 @@ namespace SpikeApp.Controls.ViewModels
                     break;
                 }
             }
+
+            if (Devices.Count == 0)
+            {
+                CanStartConnect = false;
+            }
+            else
+            {
+                CanStartConnect = true;
+                if (SelectedDevice == null)
+                {
+                    SelectedDevice = Devices[0];
+                }
+            }
         }
 
         public async Task DisconnectAsync()
         {
             if (connectedDevice == null) return;
 
-            await ViewModelStorage.CloseHubAsync();
-            connectedDevice = null;
-            IsConnected = false;
-            ConnectText = "Connect";
+            try
+            {
+                CanStartConnect = false;
+                await ViewModelStorage.CloseHubAsync();
+                connectedDevice = null;
+                IsConnected = false;
+                ConnectText = "Connect";
+            }
+            finally
+            {
+                CanStartConnect = true;
+            }
         }
 
         public async void Connect()
         {
             if (IsConnected)
             {
+                CanStartConnect = false;
                 await DisconnectAsync();
             }
             else if (SelectedDevice != null)
