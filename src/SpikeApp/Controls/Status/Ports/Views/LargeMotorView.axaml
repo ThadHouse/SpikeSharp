@@ -9,8 +9,8 @@
     <TextBlock Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center" Text="{Binding PortName}"></TextBlock>
     <TextBlock Grid.Column="3" Grid.ColumnSpan="3" HorizontalAlignment="Center">Large Motor</TextBlock>
 
-    <TextBlock Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" HorizontalAlignment="Center">Current Percentage</TextBlock>
-    <TextBlock Grid.Column="3" Grid.ColumnSpan="3" Grid.Row="1" HorizontalAlignment="Center" Text="{Binding CurrentPercentage}"></TextBlock>
+    <TextBlock Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" HorizontalAlignment="Center">Power</TextBlock>
+    <TextBlock Grid.Column="3" Grid.ColumnSpan="3" Grid.Row="1" HorizontalAlignment="Center" Text="{Binding Power}"></TextBlock>
 
     <TextBlock HorizontalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2">Angle</TextBlock>
     <TextBlock HorizontalAlignment="Center" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="2">Rate</TextBlock>

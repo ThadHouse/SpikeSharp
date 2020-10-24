@@ -5,7 +5,7 @@ using SpikeLib.Messages;
 
 namespace SpikeApp.Controls.Status.Ports.Views
 {
-    public class ForceView : PortViewBase<UltrasonicViewModel>
+    public class ForceView : PortViewBase<ForceSensorViewModel>
     {
         public ForceView() => throw new NotImplementedException();
 

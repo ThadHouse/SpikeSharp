@@ -67,7 +67,7 @@ namespace SpikeLib.Messages
             return value2;
         }
 
-        public int GetMotorFaults()
+        public int GetMotorPower()
         {
             return value3;
         }
@@ -77,15 +77,14 @@ namespace SpikeLib.Messages
             return value0;
         }
 
-        public int GetForce()
-        {
-            return value0;
-        }
-
         public ColorValue GetColor()
         {
             return (ColorValue)value1;
         }
+
+        public int GetForceNewtons() => value0;
+        public int GetForcePressed() => value1;
+        public int GetForceRaw() => value2;
 
         public int GetColorRed() => value2;
         public int GetColorGreen() => value3;
@@ -264,13 +263,26 @@ namespace SpikeLib.Messages
                 case 0:
                     port = new PortStatus(PortType.None);
                     break;
-                case 75:
-                    int absAngle = values[2].GetInt32();
-                    if (absAngle < 0) {
-                        absAngle += 360;
+                case 49:
+                    {
+                        int absAngle = values[2].GetInt32();
+                        if (absAngle < 0)
+                        {
+                            absAngle += 360;
+                        }
+                        port = new PortStatus(PortType.LargeMotor, values[0].GetInt32(), values[1].GetInt32(), absAngle, values[3].GetInt32());
+                        break;
                     }
-                    port = new PortStatus(PortType.MediumMotor, values[0].GetInt32(), values[1].GetInt32(), absAngle, values[3].GetInt32());
-                    break;
+                case 75:
+                    {
+                        int absAngle = values[2].GetInt32();
+                        if (absAngle < 0)
+                        {
+                            absAngle += 360;
+                        }
+                        port = new PortStatus(PortType.MediumMotor, values[0].GetInt32(), values[1].GetInt32(), absAngle, values[3].GetInt32());
+                        break;
+                    }
                 case 61:
                     var val1 = values[1];
                     if (val1.ValueKind == JsonValueKind.Null)
@@ -292,6 +304,9 @@ namespace SpikeLib.Messages
                     {
                         port = new PortStatus(PortType.UltrasonicSensor, val0.GetInt32());
                     }
+                    break;
+                case 63:
+                    port = new PortStatus(PortType.ForceSensor, values[0].GetInt32(), values[1].GetInt32(), values[2].GetInt32());
                     break;
                 default:
                     port = new PortStatus(PortType.Unknown);

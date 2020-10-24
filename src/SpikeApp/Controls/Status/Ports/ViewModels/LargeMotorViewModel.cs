@@ -4,11 +4,11 @@ namespace SpikeApp.Controls.Status.Ports.ViewModels
 {
     public class LargeMotorViewModel : PortViewModelBase
     {
-        private int currentPercentage;
-        public int CurrentPercentage
+        private int power;
+        public int Power
         {
-            get => currentPercentage;
-            set => RaiseAndSetIfChanged(ref currentPercentage, value);
+            get => power;
+            set => RaiseAndSetIfChanged(ref power, value);
         }
 
         private int angle;
@@ -34,7 +34,7 @@ namespace SpikeApp.Controls.Status.Ports.ViewModels
 
         public override void Update(in PortStatus status)
         {
-            CurrentPercentage = status.GetMotorFaults();
+            Power = status.GetMotorPower();
             Angle = status.GetMotorAngle();
             AbsoulteAngle = status.GetMotorAbsoluteAngle();
             Rate = status.GetMotorRate();

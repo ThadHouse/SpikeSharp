@@ -5,12 +5,17 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SpikeApp.Controls.Status.Ports.Views.ForceView">
   <Border BorderBrush="Black" BorderThickness="0,2,0,0">
-  <Grid ColumnDefinitions="*,*" RowDefinitions="*,*">
+  <Grid ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="*,*,*">
     <TextBlock Grid.Column="0" HorizontalAlignment="Center" Text="{Binding PortName}"></TextBlock>
-    <TextBlock Grid.Column="1" HorizontalAlignment="Center">Ultrasonic</TextBlock>
+    <TextBlock Grid.Column="1" HorizontalAlignment="Center">Force Sensor</TextBlock>
 
-    <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center">Force (Nm)</TextBlock>
-    <TextBlock Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" Text="{Binding Force}"></TextBlock>
+    <TextBlock HorizontalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1">Force (N)</TextBlock>
+    <TextBlock HorizontalAlignment="Center" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="1">Pressed</TextBlock>
+    <TextBlock HorizontalAlignment="Center" Grid.Column="4" Grid.ColumnSpan="2" Grid.Row="1">Raw</TextBlock>
+
+    <TextBlock HorizontalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" Text="{Binding Force}"/>
+    <TextBlock HorizontalAlignment="Center" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="2" Text="{Binding Pressed}"/>
+    <TextBlock HorizontalAlignment="Center" Grid.Column="4" Grid.ColumnSpan="2" Grid.Row="2" Text="{Binding Raw}"/>
   </Grid>
   </Border>
 </UserControl>
