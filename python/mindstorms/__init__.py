@@ -615,8 +615,9 @@ class Motor:
     def __init__(self, port):
         """
         Controls a single motor
+
         Parameters
-        -------------
+        ------------
         port : The port label the motor is connected to.
 
         Type : string (text)

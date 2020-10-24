@@ -169,7 +169,7 @@ namespace SpikeLib.Messages
             return !(left == right);
         }
     }
-    
+
     public class PortStatusMessage : IStatusMessage
     {
         private readonly PortStatus portA;
@@ -265,7 +265,11 @@ namespace SpikeLib.Messages
                     port = new PortStatus(PortType.None);
                     break;
                 case 75:
-                    port = new PortStatus(PortType.MediumMotor, values[0].GetInt32(), values[1].GetInt32(), values[2].GetInt32(), values[3].GetInt32());
+                    int absAngle = values[2].GetInt32();
+                    if (absAngle < 0) {
+                        absAngle += 360;
+                    }
+                    port = new PortStatus(PortType.MediumMotor, values[0].GetInt32(), values[1].GetInt32(), absAngle, values[3].GetInt32());
                     break;
                 case 61:
                     var val1 = values[1];

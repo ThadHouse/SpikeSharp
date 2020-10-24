@@ -291,6 +291,29 @@ namespace SpikeLib
             }
             while (fileToUpload.Position < fileToUpload.Length);
 
+            postStream.Seek(0, SeekOrigin.Begin);
+            postStream.SetLength(0);
+            {
+                using var writer = new Utf8JsonWriter(postStream);
+                writer.WriteStartObject();
+                var nowTime = DateTime.UtcNow.Ticks; // Fix this to be unix epoch milliseconds (js getDate)
+                writer.WriteString("m", "program_execute");
+
+                writer.WriteStartObject("p");
+                writer.WriteNumber("slotid", slot);
+
+                writer.WriteEndObject();
+                string randomString = "4abc";
+
+                writer.WriteString("i", randomString);
+                writer.WriteEndObject();
+            }
+
+            postStream.WriteByte(13);
+            postStream.Seek(0, SeekOrigin.Begin);
+            await postStream.CopyToAsync(spikeConnection.WriteStream, cancellationToken);
+            await spikeConnection.WriteStream.FlushAsync(cancellationToken);
+
             return true;
         }
 
