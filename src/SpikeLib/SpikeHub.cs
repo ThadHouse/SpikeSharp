@@ -2,6 +2,7 @@
 using SpikeLib.Responses;
 using System;
 using System.Buffers;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Pipelines;
 using System.Text;
@@ -112,7 +113,7 @@ namespace SpikeLib
                         ReadOnlySequence<byte> line = buffer.Slice(0, position.Value);
                         try
                         {
-                            
+
 
                             using var document = JsonDocument.Parse(line);
                             var parsedMessage = IMessage.ParseMessage(document);
@@ -125,8 +126,7 @@ namespace SpikeLib
                         catch (Exception ex)
 #pragma warning restore CA1031 // Do not catch general exception types
                         {
-                            Console.WriteLine(Encoding.UTF8.GetString(line));
-                            Console.WriteLine(ex);
+                            Debug.WriteLine(ex);
                             ;
                             // TODO handle parsing exception
                         }
@@ -183,13 +183,13 @@ namespace SpikeLib
             }
         }
 
-        public async Task<StorageResponse> RequestStorageAsync(CancellationToken cancellationToken = default)
+        public async Task RequestStorageAsync(CancellationToken cancellationToken = default)
         {
             using var stream = new MemoryStream();
             {
                 using var writer = new Utf8JsonWriter(stream);
                 writer.WriteStartObject();
-                writer.WriteString("m", "get_storage_status");
+                writer.WriteString("m", "trigger_current_state");
                 writer.WriteStartObject("p");
                 writer.WriteEndObject();
 
@@ -201,9 +201,7 @@ namespace SpikeLib
             stream.WriteByte(13);
             stream.Seek(0, SeekOrigin.Begin);
             await stream.CopyToAsync(spikeConnection.WriteStream, cancellationToken);
-            await stream.FlushAsync(cancellationToken);
-
-            return await storageResponseChannel.Reader.ReadAsync(cancellationToken);
+            await spikeConnection.WriteStream.FlushAsync(cancellationToken);
         }
 
         public async Task<bool> UploadFileAsync(Stream fileToUpload, int slot, string name, CancellationToken cancellationToken = default)
@@ -217,7 +215,7 @@ namespace SpikeLib
             {
                 using var writer = new Utf8JsonWriter(postStream);
                 writer.WriteStartObject();
-                var nowTime = DateTime.UtcNow.Ticks;
+                var nowTime = DateTime.UtcNow.Ticks; // Fix this to be unix epoch milliseconds (js getDate)
                 writer.WriteString("m", "start_write_program");
 
                 writer.WriteStartObject("p");
@@ -242,6 +240,7 @@ namespace SpikeLib
             postStream.WriteByte(13);
             postStream.Seek(0, SeekOrigin.Begin);
             await postStream.CopyToAsync(spikeConnection.WriteStream, cancellationToken);
+            await spikeConnection.WriteStream.FlushAsync(cancellationToken);
 
             var readValue = await programWriteChannel.Reader.ReadAsync(cancellationToken);
 
@@ -274,6 +273,7 @@ namespace SpikeLib
                 postStream.WriteByte(13);
                 postStream.Seek(0, SeekOrigin.Begin);
                 await postStream.CopyToAsync(spikeConnection.WriteStream, cancellationToken);
+                await spikeConnection.WriteStream.FlushAsync(cancellationToken);
 
                 var readWriteResponse = await programWriteChannel.Reader.ReadAsync(cancellationToken);
                 ;

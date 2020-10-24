@@ -30,6 +30,7 @@ namespace SpikeApp.Controls.ViewModels
             ConsoleViewModel.AddChannelReader(Hub.ConsoleMessagesReader);
             ProgramViewModel.AddChannelReader(Hub.StorageUpdateReader);
             StatusViewModel.AddChannelReader(Hub.StatusMessageReader);
+            await Task.Delay(500);
             await ProgramViewModel.RefreshAsync();
         }
 

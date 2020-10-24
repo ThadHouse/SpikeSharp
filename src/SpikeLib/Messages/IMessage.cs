@@ -68,7 +68,7 @@ namespace SpikeLib.Messages
                 switch (idChar)
                 {
                     case '0':
-                        return new StorageResponse(idVal, document);
+                        return null;
                     case '1':
                         return new StartWriteProgramResponse(idVal, document);
                     case '2':

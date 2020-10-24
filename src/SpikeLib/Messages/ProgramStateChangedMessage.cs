@@ -22,9 +22,16 @@ namespace SpikeLib.Messages
             var properties = document.RootElement.GetProperty(stackalloc byte[] { (byte)'p' });
 
             Started = properties[1].GetBoolean();
-            var strVal = properties[0].GetString()!;
-            var base64 = Convert.FromBase64String(strVal);
-            ProgramName = Encoding.UTF8.GetString(base64);
+            var strVal = properties[0].GetString();
+            if (strVal != null)
+            {
+                var base64 = Convert.FromBase64String(strVal);
+                ProgramName = Encoding.UTF8.GetString(base64);
+            }
+            else
+            {
+                ProgramName = "None";
+            }
             ;
         }
 

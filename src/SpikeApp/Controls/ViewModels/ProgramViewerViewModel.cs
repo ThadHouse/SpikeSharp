@@ -40,13 +40,12 @@ namespace SpikeApp.Controls.ViewModels
         {
             var hub = ViewModelStorage.Hub;
             if (hub == null) return;
-            var storage = await hub.RequestStorageAsync();
-            HandleUpdate(storage.Slots);
+            await hub.RequestStorageAsync();
         }
 
         public async void UploadFile()
         {
-            
+
             OpenFileDialog dialog = new OpenFileDialog
             {
                 AllowMultiple = false,
