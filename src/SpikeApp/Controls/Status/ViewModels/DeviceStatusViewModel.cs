@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using SpikeApp.Controls.Status.Ports;
 using SpikeApp.Utilities;
 using SpikeLib.Messages;
 
@@ -16,14 +17,16 @@ namespace SpikeApp.Controls.Status.ViewModels
         private readonly ThreeAxisViewModel gyroRate;
         private readonly ThreeAxisViewModel accelerometer;
         private readonly OrientationViewModel orientation;
+        private readonly PortStorage portStorage;
 
-        public DeviceStatusViewModel(BatteryViewModel battery, ThreeAxisViewModel gyroAngle, ThreeAxisViewModel gyroRate, ThreeAxisViewModel accelerometer, OrientationViewModel orientation)
+        public DeviceStatusViewModel(BatteryViewModel battery, ThreeAxisViewModel gyroAngle, ThreeAxisViewModel gyroRate, ThreeAxisViewModel accelerometer, OrientationViewModel orientation, PortStorage portStorage)
         {
             this.battery = battery;
             this.gyroAngle = gyroAngle;
             this.gyroRate = gyroRate;
             this.accelerometer = accelerometer;
             this.orientation = orientation;
+            this.portStorage = portStorage;
         }
 
         private void HandleGeneralStatusUpdate(PortStatusMessage message)
