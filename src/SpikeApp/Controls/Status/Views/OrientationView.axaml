@@ -4,8 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SpikeApp.Controls.Status.Views.OrientationView">
-  <Grid ColumnDefinitions="*,*">
-    <TextBlock Grid.Column="0" HorizontalAlignment="Center">Orientation</TextBlock>
-    <TextBlock Grid.Column="1" HorizontalAlignment="Center" Text="{Binding Orientation}"></TextBlock>
-  </Grid>
+  <Border BorderBrush="Black" BorderThickness="0,2,0,0">
+    <Grid ColumnDefinitions="*,*">
+      <TextBlock Grid.Column="0" HorizontalAlignment="Center">Orientation</TextBlock>
+      <TextBlock Grid.Column="1" HorizontalAlignment="Center" Text="{Binding Orientation}"></TextBlock>
+    </Grid>
+  </Border>
 </UserControl>

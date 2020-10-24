@@ -7,7 +7,7 @@
              x:Class="SpikeApp.Controls.Status.Views.DeviceStatusView">
   <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
     <StackPanel>
-      <TextBlock HorizontalAlignment="Center">Device Status</TextBlock>
+      <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="24" Margin="0,10,0,0" >Device Status</TextBlock>
       <ctls:BatteryView Name="Battery"></ctls:BatteryView>
       <ctls:ThreeAxisView TypeName="Gyro Angle" Name="GyroAngle"/>
       <ctls:ThreeAxisView TypeName="Gyro Rate" Name="GyroRate"/>

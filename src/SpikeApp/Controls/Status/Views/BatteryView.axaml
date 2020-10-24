@@ -4,14 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SpikeApp.Controls.Status.Views.BatteryView">
-  <Grid ColumnDefinitions="*,*" RowDefinitions="*,*,*">
-    <TextBlock HorizontalAlignment="Center" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">Battery</TextBlock>
+  <Border BorderBrush="Black" BorderThickness="0,2,0,0">
+    <Grid ColumnDefinitions="*,*" RowDefinitions="*,*,*">
+      <TextBlock HorizontalAlignment="Center" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">Battery</TextBlock>
 
-    <TextBlock HorizontalAlignment="Center" Grid.Column="0" Grid.Row="1">Voltage</TextBlock>
-    <TextBlock HorizontalAlignment="Center" Grid.Column="1" Grid.Row="1">Percentage</TextBlock>
+      <TextBlock HorizontalAlignment="Center" Grid.Column="0" Grid.Row="1">Voltage</TextBlock>
+      <TextBlock HorizontalAlignment="Center" Grid.Column="1" Grid.Row="1">Percentage</TextBlock>
 
-    <TextBlock HorizontalAlignment="Center" Grid.Column="0" Grid.Row="2" Text="{Binding Voltage}"/>
-    <TextBlock HorizontalAlignment="Center" Grid.Column="1" Grid.Row="2" Text="{Binding Percentage}"/>
+      <TextBlock HorizontalAlignment="Center" Grid.Column="0" Grid.Row="2" Text="{Binding Voltage}"/>
+      <TextBlock HorizontalAlignment="Center" Grid.Column="1" Grid.Row="2" Text="{Binding Percentage}"/>
 
-  </Grid>
+    </Grid>
+  </Border>
 </UserControl>

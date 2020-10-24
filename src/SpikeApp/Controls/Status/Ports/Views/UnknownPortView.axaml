@@ -4,8 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SpikeApp.Controls.Status.Ports.Views.UnknownPortView">
+  <Border BorderBrush="Black" BorderThickness="0,2,0,0">
   <Grid ColumnDefinitions="*,*" >
     <TextBlock Grid.Column="0" HorizontalAlignment="Center" Text="{Binding PortName}"></TextBlock>
     <TextBlock Grid.Column="1" HorizontalAlignment="Center">Unknown</TextBlock>    
   </Grid>
+  </Border>
 </UserControl>
