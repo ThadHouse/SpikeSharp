@@ -22,8 +22,8 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Package
-      run:  dotnet publish src\SpikeApp\SpikeApp.csproj  -c Release -r win-x64 /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true
+      run:  dotnet publish src\SpikeApp\SpikeApp.csproj  -c Release -r win-x64
     - uses: actions/upload-artifact@v2
       with:
         name: Windows Executable
-        path: src\SpikeApp\bin\Release\net5.0\win-x64\publish\SpikeApp.exe
+        path: src\SpikeApp\bin\Release\net5.0\win-x64\publish\
