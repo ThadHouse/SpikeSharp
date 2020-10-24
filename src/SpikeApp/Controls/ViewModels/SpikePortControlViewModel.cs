@@ -78,6 +78,10 @@ namespace SpikeApp.Controls.ViewModels
                             {
                                 // Disconnect
                                 await DisconnectAsync();
+                                if (SelectedDevice == device)
+                                {
+                                    SelectedDevice = null;
+                                }
                             }
                             // Refresh
                             await RefreshAsync();
@@ -247,8 +251,6 @@ namespace SpikeApp.Controls.ViewModels
         public async Task RefreshAsync()
         {
             if (connectedDevice != null) return;
-
-
 
             // Enumerate, see if we have a serial connection
             foreach (var device in Devices)

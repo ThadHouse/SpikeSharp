@@ -1,17 +1,17 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using SpikeApp.Controls.ViewModels;
+using SpikeApp.Controls.Status.ViewModels;
 
-namespace SpikeApp.Controls.Views
+namespace SpikeApp.Controls.Status.Views
 {
-    public class DeviceStatus : UserControl
+    public class OrientationView : UserControl
     {
-        public DeviceStatus()
+        public OrientationViewModel ViewModel { get; } = new();
+        public OrientationView()
         {
+            DataContext = ViewModel;
             this.InitializeComponent();
-
-            //DataContext = ViewModelStorage.StatusViewModel;
         }
 
         private void InitializeComponent()

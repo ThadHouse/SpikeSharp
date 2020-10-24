@@ -1,17 +1,18 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using SpikeApp.Controls.ViewModels;
+using SpikeApp.Controls.Status.ViewModels;
 
-namespace SpikeApp.Controls.Views
+namespace SpikeApp.Controls.Status.Views
 {
-    public class DeviceStatus : UserControl
+    public class BatteryView : UserControl
     {
-        public DeviceStatus()
-        {
-            this.InitializeComponent();
+        public BatteryViewModel ViewModel { get; } = new();
 
-            //DataContext = ViewModelStorage.StatusViewModel;
+        public BatteryView()
+        {
+            DataContext = ViewModel;
+            this.InitializeComponent();
         }
 
         private void InitializeComponent()

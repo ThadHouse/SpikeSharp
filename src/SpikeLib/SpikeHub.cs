@@ -69,11 +69,21 @@ namespace SpikeLib
             var token = tokenSource.Token;
             var stream = spikeConnection.ReadStream;
             var pipe = dataPipe.Writer;
+            byte[] data = new byte[1];
+            var memory = data.AsMemory();
             while (!token.IsCancellationRequested)
             {
                 try
                 {
-                    await stream.CopyToAsync(pipe, token);
+                    var len = await stream.ReadAsync(memory, token);
+                    if (len < 1) continue;
+                    await pipe.WriteAsync(memory);
+                    if (data[0] == 13)
+                    {
+                        await pipe.FlushAsync();
+                    }
+                    //await stream.ReadAsync()
+                    //await stream.CopyToAsync(pipe, token);
                 }
                 catch (OperationCanceledException)
                 {

@@ -6,7 +6,7 @@
              x:Class="SpikeApp.Controls.Views.SpikePortControl">
   <StackPanel>
     <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Center">Device Status</TextBlock>
-    <ListBox Height="200" HorizontalAlignment="Stretch" Items="{Binding Devices, Mode=TwoWay}" SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"></ListBox>
+    <ListBox Height="50" HorizontalAlignment="Stretch" Items="{Binding Devices, Mode=TwoWay}" SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"></ListBox>
     <Button HorizontalAlignment="Stretch" Command="{Binding Connect}" IsEnabled="{Binding CanStartConnect}" Content="{Binding ConnectText}"></Button>
 
   </StackPanel>

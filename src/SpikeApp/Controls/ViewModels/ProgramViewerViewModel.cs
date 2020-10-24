@@ -40,6 +40,7 @@ namespace SpikeApp.Controls.ViewModels
         {
             var hub = ViewModelStorage.Hub;
             if (hub == null) return;
+            await Task.Delay(1200);
             await hub.RequestStorageAsync();
         }
 

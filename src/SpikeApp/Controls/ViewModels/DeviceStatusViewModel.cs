@@ -9,7 +9,7 @@ using SpikeLib.Messages;
 
 namespace SpikeApp.Controls.ViewModels
 {
-    public class DeviceStatusViewModel : ViewModelBase
+    public class DeviceStatusViewModelOld : ViewModelBase
     {
         private string battery = "Battery: 8.0V 100%";
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using SpikeApp.Controls.Status.ViewModels;
 using SpikeApp.Controls.Windows;
 using SpikeLib;
 
@@ -14,12 +15,13 @@ namespace SpikeApp.Controls.ViewModels
         public static readonly ConsoleControlViewModel ConsoleViewModel = new();
         public static readonly SpikePortControlViewModel SpikePortViewModel = new();
         public static readonly ProgramViewerViewModel ProgramViewModel = new();
-        public static readonly DeviceStatusViewModel StatusViewModel = new();
         public static readonly UnknownMessagesViewModel UnknownViewModel = new();
 
         public static SpikeHub? Hub;
 
         public static Window MainWindow = null!;
+
+        public static DeviceStatusViewModel StatusViewModel = null!;
 
         public static async Task AddHubAsync(ISpikeConnection spikeConnection)
         {
@@ -47,11 +49,6 @@ namespace SpikeApp.Controls.ViewModels
             await StatusViewModel.RemoveChannelReaderAsync();
             await UnknownViewModel.RemoveChannelReaderAsync();
             // Todo clear out readers
-        }
-
-        public static void SetPortViewerViewModel(PortViewerViewModel viewModel)
-        {
-            StatusViewModel.SetPortViewerViewModel(viewModel);
         }
 
         private static UnknownMessagesWindow? unknownWindow;

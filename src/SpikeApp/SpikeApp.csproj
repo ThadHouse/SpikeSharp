@@ -25,6 +25,9 @@
     <ProjectReference Include="..\SpikeLib\SpikeLib.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Controls\Status\Views\BatteryView.axaml.cs">
+      <DependentUpon>BatteryView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Controls\Views\ProgramViewer.axaml.cs">
       <DependentUpon>ProgramViewer.axaml</DependentUpon>
     </Compile>

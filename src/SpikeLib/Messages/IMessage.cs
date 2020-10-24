@@ -33,7 +33,7 @@ namespace SpikeLib.Messages
                             break;
                         case 4:
                             // Gesture
-                            break;
+                            return new GestureMessage(document);
                         case 12:
                             // Program start [ "prog name", true for start, false for stop
                             return new ProgramStateChangedMessage(document);

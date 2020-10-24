@@ -31,7 +31,9 @@ namespace SpikeLib.Messages
 
             RawText = document.RootElement.GetRawText();
 
-            Gesture = "TODO";
+            var properties = document.RootElement.GetProperty(stackalloc byte[] { (byte)'p' });
+
+            Gesture = properties.GetString() ?? "None";
         }
     }
 }

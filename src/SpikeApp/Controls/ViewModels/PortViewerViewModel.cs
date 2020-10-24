@@ -18,7 +18,7 @@ namespace SpikeApp.Controls.ViewModels
             {
                 port = value;
                 PortText = $"Port {value}";
-                ViewModelStorage.SetPortViewerViewModel(this);
+                //ViewModelStorage.SetPortViewerViewModel(this);
             }
         }
 
