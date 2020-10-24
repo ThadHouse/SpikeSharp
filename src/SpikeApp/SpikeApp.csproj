@@ -25,6 +25,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0-rc.2.20475.5" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SpikeLib\SpikeLib.csproj" />
@@ -48,6 +49,17 @@
     <Compile Update="Controls\Views\ProgramViewer.axaml.cs">
       <DependentUpon>ProgramViewer.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Properties\WindowSettings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>WindowSettings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\WindowSettings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>WindowSettings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
 </Project>

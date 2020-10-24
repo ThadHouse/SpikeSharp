@@ -59,6 +59,11 @@ namespace SpikeApp.Controls.ViewModels
             unknownWindow.Show();
         }
 
+        public static void CloseUnknownWindow()
+        {
+            unknownWindow?.Close();
+        }
+
         private static void UnknownWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
             unknownWindow = null;
