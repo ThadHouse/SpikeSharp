@@ -1578,7 +1578,8 @@ class ColorSensor:
         Default : no default value
         """
         pass
-        def get_color(self):
+
+    def get_color(self):
             """
             Retrieves the detected color of a surface.
 

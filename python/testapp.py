@@ -5,10 +5,11 @@ from mindstorms.operator import equal_to
 import math
 import math
 
-ap = App()
+hub = MSHub()
 
 rightArm = Motor('F')
 leftArm = Motor('B')
+color = ColorSensor('C')
 
 def calibrate_charlie():
     rightArm.set_stall_detection(True)
@@ -17,11 +18,7 @@ def calibrate_charlie():
     leftArm.start(20)
     rightArm.start(-20)
 
-    print('Starting')
-
     wait_for_seconds(1)
-
-    print('Run To Position')
 
     rightArm.run_to_position(0, 'clockwise', 50)
     leftArm.run_to_position(0, 'counterclockwise', 50)
@@ -41,7 +38,11 @@ def center_right_arm():
 def tip_hat():
     rightArm.run_to_position(220, 'counterclockwise')
 
+color.light_up_all(0)
+
 calibrate_charlie()
+
+hub.speaker.beep()
 
 open_center()
 
