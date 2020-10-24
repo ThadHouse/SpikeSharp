@@ -26,4 +26,4 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: Windows Executable
-        path: src\SpikeApp\bin\Release\net5.0\win-x64\publish\
+        path: src\SpikeApp\bin\Release\net5.0\win-x64-windows10.0.17763.0\publish\
