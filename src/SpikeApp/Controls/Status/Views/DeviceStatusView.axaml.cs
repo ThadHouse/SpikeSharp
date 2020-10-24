@@ -1,10 +1,8 @@
-﻿using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using SpikeApp.Controls.Status.Ports;
 using SpikeApp.Controls.Status.ViewModels;
 using SpikeApp.Controls.ViewModels;
-using SpikeLib.Messages;
 
 namespace SpikeApp.Controls.Status.Views
 {

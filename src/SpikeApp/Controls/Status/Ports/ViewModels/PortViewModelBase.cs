@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SpikeApp.Utilities;
+﻿using SpikeApp.Utilities;
 using SpikeLib.Messages;
 
 namespace SpikeApp.Controls.Status.Ports.ViewModels

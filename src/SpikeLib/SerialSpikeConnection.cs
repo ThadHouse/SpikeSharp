@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
-using System.Linq;
 using System.Management;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Management.Infrastructure;
 
 namespace SpikeLib
 {

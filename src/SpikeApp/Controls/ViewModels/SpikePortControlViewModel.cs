@@ -1,23 +1,15 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO.Ports;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Avalonia.Threading;
-using SharpGen.Runtime.Win32;
 using SpikeApp.Utilities;
 using SpikeLib;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.Devices.Enumeration;
 using Windows.Devices.SerialCommunication;
-using Windows.Devices.Usb;
-using Windows.Gaming.Input.ForceFeedback;
 using Windows.Networking.Sockets;
 
 namespace SpikeApp.Controls.ViewModels

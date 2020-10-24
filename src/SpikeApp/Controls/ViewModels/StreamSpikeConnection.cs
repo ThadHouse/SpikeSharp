@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using System.Threading.Tasks;
 using SpikeLib;
-using Windows.Devices.SerialCommunication;
 using Windows.Networking.Sockets;
 
 namespace SpikeApp.Controls.ViewModels

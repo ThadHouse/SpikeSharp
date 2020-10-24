@@ -44,7 +44,7 @@ namespace SpikeLib
             PipelineReadLoop = Task.Run(() => PipelineTaskMainAsync());
         }
 
-        CancellationTokenSource tokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource tokenSource = new CancellationTokenSource();
         private Task? SerialReadLoopLoop;
         private Task? PipelineReadLoop;
 
