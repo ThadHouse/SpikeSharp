@@ -70,12 +70,12 @@ namespace SpikeApp.Controls.ViewModels
             dirSet = message.Acceleration;
             Accelerometer = $"Accel: X: {dirSet.X} Y: {dirSet.Y} Z: {dirSet.Z}";
 
-            PortA?.UpdateFromStatus(message.PortA);
-            PortB?.UpdateFromStatus(message.PortB);
-            PortC?.UpdateFromStatus(message.PortC);
-            PortD?.UpdateFromStatus(message.PortD);
-            PortE?.UpdateFromStatus(message.PortE);
-            PortF?.UpdateFromStatus(message.PortF);
+            PortA?.UpdateFromStatus(message[PortValue.PortA]);
+            PortB?.UpdateFromStatus(message[PortValue.PortB]);
+            PortC?.UpdateFromStatus(message[PortValue.PortC]);
+            PortD?.UpdateFromStatus(message[PortValue.PortD]);
+            PortE?.UpdateFromStatus(message[PortValue.PortE]);
+            PortF?.UpdateFromStatus(message[PortValue.PortF]);
         }
 
         public void SetPortViewerViewModel(PortViewerViewModel viewModel)

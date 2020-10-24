@@ -25,6 +25,18 @@
     <ProjectReference Include="..\SpikeLib\SpikeLib.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Controls\Status\Ports\Views\UnknownPortView.axaml.cs">
+      <DependentUpon>UnknownPortView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\Status\Ports\Views\EmptyPortView.axaml.cs">
+      <DependentUpon>EmptyPortView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\Status\Ports\Views\LargeMotorView.axaml.cs">
+      <DependentUpon>LargeMotorView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\Status\Ports\Views\ForceView.axaml.cs">
+      <DependentUpon>ForceView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Controls\Status\Views\BatteryView.axaml.cs">
       <DependentUpon>BatteryView.axaml</DependentUpon>
     </Compile>

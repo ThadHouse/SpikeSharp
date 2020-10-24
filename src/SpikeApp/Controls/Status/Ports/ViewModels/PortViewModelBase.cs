@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SpikeApp.Utilities;
+using SpikeLib.Messages;
 
 namespace SpikeApp.Controls.Status.Ports.ViewModels
 {
@@ -15,5 +16,7 @@ namespace SpikeApp.Controls.Status.Ports.ViewModels
             get => portName;
             set => RaiseAndSetIfChanged(ref portName, $"Port {value}");
         }
+
+        public abstract void Update(in PortStatus status);
     }
 }

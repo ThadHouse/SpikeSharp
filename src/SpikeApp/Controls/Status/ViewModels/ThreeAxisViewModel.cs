@@ -39,7 +39,7 @@ namespace SpikeApp.Controls.Status.ViewModels
             set => RaiseAndSetIfChanged(ref z, value);
         }
 
-        public void Update(DirectionSet directions)
+        public void Update(in DirectionSet directions)
         {
             X = directions.X;
             Y = directions.Y;

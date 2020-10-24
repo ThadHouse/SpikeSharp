@@ -34,6 +34,7 @@ namespace SpikeApp.Controls.Status.ViewModels
             gyroAngle.Update(message.GyroAngles);
             gyroRate.Update(message.GyroRates);
             accelerometer.Update(message.Acceleration);
+            portStorage.Update(message);
         }
 
         private void HandleUpdate(IStatusMessage message)

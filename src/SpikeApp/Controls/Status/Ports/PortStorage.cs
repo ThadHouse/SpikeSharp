@@ -5,21 +5,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using SpikeApp.Controls.Status.Ports.ViewModels;
 using SpikeApp.Controls.Status.Ports.Views;
 using SpikeLib.Messages;
 
 namespace SpikeApp.Controls.Status.Ports
 {
+
     public class PortStorage
     {
-        public ImmutableArray<ImmutableDictionary<PortType, IPortView>> Ports { get; }
-        public int StartIndex { get; }
-        public Avalonia.Controls.Controls PortControls { get; }
+        private readonly ImmutableArray<ImmutableDictionary<PortType, IPortView>> AllowedPortList;
+        private readonly int startIndex;
+        private readonly Avalonia.Controls.Controls portControls;
+
+        private readonly IPortView[] currentPorts = new IPortView[6];
 
         public PortStorage(Avalonia.Controls.Controls controls)
         {
-            StartIndex = controls.Count;
-            PortControls = controls;
+            startIndex = controls.Count;
+            portControls = controls;
 
             string[] portMap = new string[] { "A", "B", "C", "D", "E", "F" };
             List<ImmutableDictionary<PortType, IPortView>> ports = new();
@@ -27,15 +31,45 @@ namespace SpikeApp.Controls.Status.Ports
             {
                 var portValue = portMap[i];
                 Dictionary<PortType, IPortView> port = new();
-                port[PortType.None] = new EmptyPort(portValue);
+                port[PortType.None] = new EmptyPortView(portValue);
+                port[PortType.ColorSensor] = new ColorSensorView(portValue);
+                port[PortType.UltrasonicSensor] = new UltrasonicView(portValue);
+                port[PortType.MediumMotor] = new MediumMotorView(portValue);
+                port[PortType.LargeMotor] = new LargeMotorView(portValue);
+                port[PortType.ForceSensor] = new ForceView(portValue);
+                port[PortType.Unknown] = new UnknownPortView(portValue);
                 ports.Add(port.ToImmutableDictionary());
             }
-            Ports = ports.ToImmutableArray();
+            AllowedPortList = ports.ToImmutableArray();
 
             for (int i = 0; i < 6; i++)
             {
-                PortControls.Add(Ports[i][PortType.None]);
+                var port = AllowedPortList[i][PortType.None];
+                portControls.Add(port);
+                currentPorts[i] = port;
             }
         }
+
+        public void Update(PortStatusMessage message)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                ref readonly PortStatus status = ref message[(PortValue)i];
+                var currentPort = currentPorts[i];
+                if (status.Type != currentPort.PortType)
+                {
+                    var canSetDict = AllowedPortList[i];
+                    if (!canSetDict.TryGetValue(status.Type, out currentPort))
+                    {
+                        currentPort = canSetDict[PortType.None];
+                    }
+                    currentPorts[i] = currentPort;
+                    portControls[startIndex + i] = currentPort;
+                }
+                currentPort.Update(status);
+            }
+        }
+
+        
     }
 }

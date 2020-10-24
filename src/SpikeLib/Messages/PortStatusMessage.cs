@@ -14,20 +14,27 @@ namespace SpikeLib.Messages
         Unknown
     }
 
+    public enum PortValue
+    {
+        PortA,
+        PortB,
+        PortC,
+        PortD,
+        PortE,
+        PortF
+    }
+
     public enum ColorValue
     {
         None = -1,
-        A,
-        B,
-        C,
-        D,
-        E,
-        F,
-        G,
-        H,
-        I,
-        J,
-        K
+        Black,
+        Violet,
+        Blue,
+        Cyan,
+        Green,
+        Yellow,
+        Red,
+        White
     }
 
     public readonly struct PortStatus : IEquatable<PortStatus>
@@ -47,48 +54,44 @@ namespace SpikeLib.Messages
 
         public int GetMotorRate()
         {
-            if (Type != PortType.MediumMotor && Type != PortType.LargeMotor)
-            {
-                throw new InvalidOperationException("Cannot read rate of non motor");
-            }
             return value0;
         }
 
         public int GetMotorAngle()
         {
-            if (Type != PortType.MediumMotor && Type != PortType.LargeMotor)
-            {
-                throw new InvalidOperationException("Cannot read angle of non motor");
-            }
             return value1;
         }
 
         public int GetMotorAbsoluteAngle()
         {
-            if (Type != PortType.MediumMotor && Type != PortType.LargeMotor)
-            {
-                throw new InvalidOperationException("Cannot read absolute angle of non motor");
-            }
             return value2;
+        }
+
+        public int GetMotorFaults()
+        {
+            return value3;
         }
 
         public int GetColorReflectionPercentage()
         {
-            if (Type != PortType.ColorSensor)
-            {
-                throw new InvalidOperationException("Cannot read color sensor value");
-            }
+            return value0;
+        }
+
+        public int GetForce()
+        {
             return value0;
         }
 
         public ColorValue GetColor()
         {
-            if (Type != PortType.ColorSensor)
-            {
-                throw new InvalidOperationException();
-            }
             return (ColorValue)value1;
         }
+
+        public int GetColorRed() => value2;
+        public int GetColorGreen() => value3;
+        public int GetColorBlue() => value4;
+
+        public int GetDistanceCm() => value0;
 
         public override bool Equals(object? obj)
         {
@@ -169,18 +172,46 @@ namespace SpikeLib.Messages
     
     public class PortStatusMessage : IStatusMessage
     {
-        public PortStatus PortA { get; }
-        public PortStatus PortB { get; }
-        public PortStatus PortC { get; }
-        public PortStatus PortD { get; }
-        public PortStatus PortE { get; }
-        public PortStatus PortF { get; }
+        private readonly PortStatus portA;
+        private readonly PortStatus portB;
+        private readonly PortStatus portC;
+        private readonly PortStatus portD;
+        private readonly PortStatus portE;
+        private readonly PortStatus portF;
 
-        public DirectionSet Acceleration { get; }
-        public DirectionSet GyroRates { get; }
-        public DirectionSet GyroAngles { get; }
+        private readonly DirectionSet acceleration;
+        private readonly DirectionSet gyroRates;
+        private readonly DirectionSet gyroAngles;
+
+        public ref readonly DirectionSet Acceleration => ref acceleration;
+        public ref readonly DirectionSet GyroRates => ref gyroRates;
+        public ref readonly DirectionSet GyroAngles => ref gyroAngles;
 
         public string RawText { get; }
+
+        public ref readonly PortStatus this[PortValue value]
+        {
+            get
+            {
+                switch (value)
+                {
+                    case PortValue.PortA:
+                        return ref portA;
+                    case PortValue.PortB:
+                        return ref portB;
+                    case PortValue.PortC:
+                        return ref portC;
+                    case PortValue.PortD:
+                        return ref portD;
+                    case PortValue.PortE:
+                        return ref portE;
+                    case PortValue.PortF:
+                        return ref portF;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(value));
+                }
+            }
+        }
 
         public PortStatusMessage(JsonDocument document)
         {
@@ -198,27 +229,27 @@ namespace SpikeLib.Messages
 
 
             SetPort(out PortStatus port, properties[0]);
-            PortA = port;
+            portA = port;
 
             SetPort(out port, properties[1]);
-            PortB = port;
+            portB = port;
 
             SetPort(out port, properties[2]);
-            PortC = port;
+            portC = port;
 
             SetPort(out port, properties[3]);
-            PortD = port;
+            portD = port;
 
             SetPort(out port, properties[4]);
-            PortE = port;
+            portE = port;
 
             SetPort(out port, properties[5]);
-            PortF = port;
+            portF = port;
 
 
-            Acceleration = new DirectionSet(properties[6]);
-            GyroRates = new DirectionSet(properties[7]);
-            GyroAngles = new DirectionSet(properties[8]);
+            acceleration = new DirectionSet(properties[6]);
+            gyroRates = new DirectionSet(properties[7]);
+            gyroAngles = new DirectionSet(properties[8]);
 
 
             // Order is 6 ports, Acceleration, Gryo Rates, Gyro Angles, Unknown string, 0

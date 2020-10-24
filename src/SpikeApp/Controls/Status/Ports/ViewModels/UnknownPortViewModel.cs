@@ -7,9 +7,10 @@ using SpikeLib.Messages;
 
 namespace SpikeApp.Controls.Status.Ports.ViewModels
 {
-    public interface IPortViewModel
+    public class UnknownPortViewModel : PortViewModelBase
     {
-        string PortName { get; set; }
-        void Update(in PortStatus status);
+        public override void Update(in PortStatus status)
+        {
+        }
     }
 }
