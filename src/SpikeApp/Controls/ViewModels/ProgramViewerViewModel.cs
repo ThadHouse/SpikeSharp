@@ -32,7 +32,9 @@ namespace SpikeApp.Controls.ViewModels
         public string Name { get; set; } = "";
 
 
+#pragma warning disable CA1822 // Mark members as static
         public async Task RefreshAsync()
+#pragma warning restore CA1822 // Mark members as static
         {
             var hub = ViewModelStorage.Hub;
             if (hub == null) return;
@@ -80,6 +82,8 @@ namespace SpikeApp.Controls.ViewModels
 
         public void AddChannelReader(ChannelReader<StorageResponse> reader)
         {
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
+
             channelReaderTask = ChannelReaderFuncAsync(reader);
         }
 

@@ -13,11 +13,11 @@ namespace SpikeApp.Controls.ViewModels
         public static readonly ProgramViewerViewModel ProgramViewModel = new();
         public static readonly UnknownMessagesViewModel UnknownViewModel = new();
 
+#pragma warning disable CA2211 // Non-constant fields should not be visible
         public static SpikeHub? Hub;
-
         public static Window MainWindow = null!;
-
         public static DeviceStatusViewModel StatusViewModel = null!;
+#pragma warning restore CA2211 // Non-constant fields should not be visible
 
         public static async Task AddHubAsync(ISpikeConnection spikeConnection)
         {

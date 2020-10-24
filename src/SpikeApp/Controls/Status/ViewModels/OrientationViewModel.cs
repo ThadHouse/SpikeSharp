@@ -14,7 +14,9 @@ namespace SpikeApp.Controls.Status.ViewModels
 
         public void Update(GestureMessage message)
         {
+#pragma warning disable CA1062 // Validate arguments of public methods
             Orientation = message.Gesture;
+#pragma warning restore CA1062 // Validate arguments of public methods
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Channels;
+﻿using System;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using SpikeApp.Utilities;
 using SpikeLib.Messages;
@@ -35,6 +36,8 @@ namespace SpikeApp.Controls.ViewModels
 
         public void AddChannelReader(ChannelReader<IMessage> reader)
         {
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
+
             channelReaderTask = ChannelReaderFuncAsync(reader);
         }
 

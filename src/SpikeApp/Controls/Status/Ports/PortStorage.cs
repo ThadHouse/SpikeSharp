@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using SpikeApp.Controls.Status.Ports.Views;
 using SpikeLib.Messages;
@@ -16,6 +17,8 @@ namespace SpikeApp.Controls.Status.Ports
 
         public PortStorage(Avalonia.Controls.Controls controls)
         {
+            if (controls == null) throw new ArgumentNullException(nameof(controls));
+
             startIndex = controls.Count;
             portControls = controls;
 
@@ -48,7 +51,9 @@ namespace SpikeApp.Controls.Status.Ports
         {
             for (int i = 0; i < 6; i++)
             {
+#pragma warning disable CA1062 // Validate arguments of public methods
                 ref readonly PortStatus status = ref message[(PortValue)i];
+#pragma warning restore CA1062 // Validate arguments of public methods
                 var currentPort = currentPorts[i];
                 if (status.Type != currentPort.PortType)
                 {

@@ -14,27 +14,29 @@ using Windows.Networking.Sockets;
 
 namespace SpikeApp.Controls.ViewModels
 {
+    public class HubInfo
+    {
+        public DeviceInformation DeviceInfo { get; }
+
+        public HubInfo(DeviceInformation info)
+        {
+            DeviceInfo = info;
+        }
+
+        public override string ToString()
+        {
+            return Name;
+        }
+
+        public string Id => DeviceInfo.Id;
+        public string Name => DeviceInfo.Name;
+        public bool IsSerial => DeviceInfo.Kind == DeviceInformationKind.DeviceInterface;
+        public bool IsValid { get; set; }
+    }
+
     public class SpikePortControlViewModel : ViewModelBase
     {
-        public class HubInfo
-        {
-            public DeviceInformation DeviceInfo { get; }
 
-            public HubInfo(DeviceInformation info)
-            {
-                DeviceInfo = info;
-            }
-
-            public override string ToString()
-            {
-                return Name;
-            }
-
-            public string Id => DeviceInfo.Id;
-            public string Name => DeviceInfo.Name;
-            public bool IsSerial => DeviceInfo.Kind == DeviceInformationKind.DeviceInterface;
-            public bool IsValid { get; set; }
-        }
 
         public ObservableCollection<HubInfo> Devices { get; } = new ObservableCollection<HubInfo>();
 
@@ -120,7 +122,7 @@ namespace SpikeApp.Controls.ViewModels
             deviceWatcherBluetooth.Start();
         }
 
-        private bool canStartConnect = false;
+        private bool canStartConnect;
         public bool CanStartConnect
         {
             get => canStartConnect;
@@ -185,7 +187,7 @@ namespace SpikeApp.Controls.ViewModels
             set => RaiseAndSetIfChanged(ref isConnected, value);
         }
 
-        public async Task ConnectAsync(HubInfo device)
+        private async Task ConnectAsync(HubInfo device)
         {
             try
             {
@@ -215,7 +217,7 @@ namespace SpikeApp.Controls.ViewModels
                     {
                         var btDevice = await BluetoothDevice.FromIdAsync(device.Id);
 
-                        var serialPort = (await btDevice.GetRfcommServicesForIdAsync(RfcommServiceId.SerialPort)).Services.First();
+                        var serialPort = (await btDevice.GetRfcommServicesForIdAsync(RfcommServiceId.SerialPort)).Services[0];
                         StreamSocket streamSocket = new();
                         await streamSocket.ConnectAsync(serialPort.ConnectionHostName, serialPort.ConnectionServiceName);
 
@@ -226,7 +228,9 @@ namespace SpikeApp.Controls.ViewModels
                         IsConnected = true;
                         ConnectText = "Disconnect";
                     }
+#pragma warning disable CA1031 // Do not catch general exception types
                     catch (Exception ex)
+#pragma warning restore CA1031 // Do not catch general exception types
                     {
                         Debug.WriteLine(ex);
                         ;

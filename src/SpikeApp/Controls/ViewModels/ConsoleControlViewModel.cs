@@ -1,4 +1,5 @@
-﻿using System.Threading.Channels;
+﻿using System;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using SpikeApp.Utilities;
 using SpikeLib.Messages;
@@ -24,7 +25,7 @@ namespace SpikeApp.Controls.ViewModels
                 try
                 {
                     var element = await reader.ReadAsync();
-                    ConsoleLog += $"{element.ToString()}\n";
+                    ConsoleLog += $"{element}\n";
                 }
                 catch (ChannelClosedException)
                 {
@@ -35,6 +36,8 @@ namespace SpikeApp.Controls.ViewModels
 
         public void AddChannelReader(ChannelReader<IConsoleMessage> reader)
         {
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
+
             channelReaderTask = ChannelReaderFuncAsync(reader);
         }
 
@@ -52,7 +55,9 @@ namespace SpikeApp.Controls.ViewModels
             ConsoleLog = "";
         }
 
+#pragma warning disable CA1822 // Mark members as static
         public void OpenUnknownWindow()
+#pragma warning restore CA1822 // Mark members as static
         {
             ViewModelStorage.StartUnknownWindow();
         }

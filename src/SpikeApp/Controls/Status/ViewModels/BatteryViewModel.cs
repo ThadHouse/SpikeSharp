@@ -22,8 +22,10 @@ namespace SpikeApp.Controls.Status.ViewModels
 
         public void Update(BatteryMessage message)
         {
+#pragma warning disable CA1062 // Validate arguments of public methods
             Voltage = message.Voltage;
             Percentage = message.Percentage;
+#pragma warning restore CA1062 // Validate arguments of public methods
         }
     }
 }

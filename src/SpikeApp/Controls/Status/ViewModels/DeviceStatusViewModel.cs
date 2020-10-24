@@ -1,4 +1,5 @@
-﻿using System.Threading.Channels;
+﻿using System;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using SpikeApp.Controls.Status.Ports;
 using SpikeApp.Utilities;
@@ -69,6 +70,8 @@ namespace SpikeApp.Controls.Status.ViewModels
 
         public void AddChannelReader(ChannelReader<IStatusMessage> reader)
         {
+            if (reader == null) throw new ArgumentNullException(nameof(reader));
+
             channelReaderTask = ChannelReaderFuncAsync(reader);
         }
 

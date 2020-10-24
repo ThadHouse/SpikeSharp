@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
-using System.Management;
 using System.Threading.Tasks;
 
 namespace SpikeLib
@@ -42,30 +41,6 @@ namespace SpikeLib
         public async Task CloseAsync()
         {
             await Task.Run(() => serialPort.Close());
-        }
-
-        public static async Task<List<string>> EnumerateConnectedHubsAsync()
-        {
-            return await Task.Run(() =>
-            {
-                List<string> ports = new List<string>();
-                using ManagementClass objInst = new ManagementClass("Win32_SerialPort");
-                var instances = objInst.GetInstances();
-                foreach (var item in instances)
-                {
-                    var pnpDevId = (string)item.GetPropertyValue("PNPDeviceId");
-                    if (!pnpDevId.StartsWith("USB", StringComparison.InvariantCultureIgnoreCase)) continue;
-
-                    var vidIndex = pnpDevId.IndexOf("VID_", StringComparison.InvariantCultureIgnoreCase);
-                    if (vidIndex < 0) continue;
-                    var vid = pnpDevId.Substring(vidIndex + 4, 4);
-                    if (vid.Equals("0694", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        ports.Add((string)item.GetPropertyValue("DeviceId"));
-                    }
-                }
-                return ports;
-            });
         }
 
         public static async Task<SerialSpikeConnection?> OpenConnectionAsync(string comPort)
