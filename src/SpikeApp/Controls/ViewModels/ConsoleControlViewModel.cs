@@ -9,7 +9,7 @@ namespace SpikeApp.Controls.ViewModels
     public class ConsoleControlViewModel : ViewModelBase
     {
         private string consoleContents = "";
-        
+
         public string ConsoleLog
         {
             get => consoleContents;
@@ -25,7 +25,7 @@ namespace SpikeApp.Controls.ViewModels
                 try
                 {
                     var element = await reader.ReadAsync();
-                    ConsoleLog += $"{element}\n";
+                    ConsoleLog += $"{element}";
                 }
                 catch (ChannelClosedException)
                 {

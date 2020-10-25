@@ -2,7 +2,9 @@
 #COMPILE
 
 import os
-from event_loop import event_loop
 
-print(os.listdir('/protocol'))
-print(dir(event_loop))
+print(os.listdir('/projects'))
+log = open("/projects/23262.py", "r")
+
+for line in log:
+    print(line)
