@@ -28,9 +28,21 @@ namespace SpikeApp.Controls.ViewModels
             await RefreshAsync();
         }
 
-        public double Slot { get; set; }
-        public string Name { get; set; } = "";
+        public int Slot { get; set; }
 
+        private bool runOnDeploy = true;
+        public bool RunOnDeploy
+        {
+            get => runOnDeploy;
+            set => RaiseAndSetIfChanged(ref runOnDeploy, value);
+        }
+
+        private bool compile = true;
+        public bool Compile
+        {
+            get => compile;
+            set => RaiseAndSetIfChanged(ref compile, value);
+        }
 
 #pragma warning disable CA1822 // Mark members as static
         public async Task RefreshAsync()
@@ -57,8 +69,12 @@ namespace SpikeApp.Controls.ViewModels
 
             var hub = ViewModelStorage.Hub;
             if (hub == null) return;
-            if (string.IsNullOrWhiteSpace(Name)) return;
-            await hub.UploadFileAsync(file, (int)Slot, Name);
+            int slot = Slot;
+            await hub.UploadFileAsync(file, slot, Path.GetFileNameWithoutExtension(result[0]));
+            if (RunOnDeploy)
+            {
+                await hub.RunProgramAsync(slot);
+            }
 
         }
 

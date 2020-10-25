@@ -6,13 +6,15 @@
              x:Class="SpikeApp.Controls.Views.ProgramViewer">
   <DockPanel>
 
-    <Grid HorizontalAlignment="Stretch" DockPanel.Dock="Bottom" ColumnDefinitions="50*, 50*" RowDefinitions="*, *, *">
-      <TextBlock Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">Slot</TextBlock>
-      <TextBlock Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center">Name</TextBlock>
-      <NumericUpDown Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" Minimum="0" Maximum="19" Increment="1" Value="{Binding Slot}"></NumericUpDown>
-      <TextBox Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" Text="{Binding Name}"></TextBox>
-      <Button Grid.Column="0" Grid.Row="2" HorizontalAlignment="Stretch" Command="{Binding Refresh}">Refresh</Button>
-      <Button Grid.Column="1" Grid.Row="2" HorizontalAlignment="Stretch" Command="{Binding UploadFile}">Upload File</Button>
+    <Grid HorizontalAlignment="Stretch" DockPanel.Dock="Bottom" ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="*, *, *">
+      <TextBlock Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" HorizontalAlignment="Center">Slot</TextBlock>
+      <TextBlock Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Center">Run On Deploy</TextBlock>
+      <TextBlock Grid.Column="4" Grid.ColumnSpan="2" HorizontalAlignment="Center">Compile</TextBlock>
+      <NumericUpDown Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" HorizontalAlignment="Stretch" Minimum="0" Maximum="19" Increment="1" Value="{Binding Slot}"></NumericUpDown>
+      <ToggleSwitch Grid.Column="2"  Grid.ColumnSpan="2" Grid.Row="1" HorizontalAlignment="Stretch" IsChecked="{Binding RunOnDeploy, Mode=TwoWay}"></ToggleSwitch>
+      <ToggleSwitch Grid.Column="4"  Grid.ColumnSpan="2" Grid.Row="1" HorizontalAlignment="Stretch" IsChecked="{Binding Compile, Mode=TwoWay}"></ToggleSwitch>
+      <Button Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" HorizontalAlignment="Stretch" Command="{Binding Refresh}">Refresh</Button>
+      <Button Grid.Column="3" Grid.ColumnSpan="3" Grid.Row="2" HorizontalAlignment="Stretch" Command="{Binding UploadFile}">Upload File</Button>
     </Grid>
     <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Center">Program List</TextBlock>
     <ScrollViewer>

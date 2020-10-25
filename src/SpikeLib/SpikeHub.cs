@@ -293,8 +293,16 @@ namespace SpikeLib
 
             postStream.Seek(0, SeekOrigin.Begin);
             postStream.SetLength(0);
+            
+
+            return true;
+        }
+
+        public async Task RunProgramAsync(int slot, CancellationToken cancellationToken = default)
+        {
+            using var stream = new MemoryStream();
             {
-                using var writer = new Utf8JsonWriter(postStream);
+                using var writer = new Utf8JsonWriter(stream);
                 writer.WriteStartObject();
                 var nowTime = DateTime.UtcNow.Ticks; // Fix this to be unix epoch milliseconds (js getDate)
                 writer.WriteString("m", "program_execute");
@@ -309,12 +317,10 @@ namespace SpikeLib
                 writer.WriteEndObject();
             }
 
-            postStream.WriteByte(13);
-            postStream.Seek(0, SeekOrigin.Begin);
-            await postStream.CopyToAsync(spikeConnection.WriteStream, cancellationToken);
+            stream.WriteByte(13);
+            stream.Seek(0, SeekOrigin.Begin);
+            await stream.CopyToAsync(spikeConnection.WriteStream, cancellationToken);
             await spikeConnection.WriteStream.FlushAsync(cancellationToken);
-
-            return true;
         }
 
         public void Dispose()
