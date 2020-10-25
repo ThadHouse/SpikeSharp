@@ -8,13 +8,10 @@
         MinWidth="800" MinHeight="400"
         x:Class="SpikeApp.MainWindow"
         Title="Mindstorms Robotics Inventor - Spike Prime Controller">
-  <Grid ColumnDefinitions="250, *, 250">
+  <Grid ColumnDefinitions="250, *">
     <ctlsstatus:DeviceStatusView Grid.Column="1"></ctlsstatus:DeviceStatusView>
-    <DockPanel HorizontalAlignment="Stretch"  Grid.Column="2">
-      <ctls:SpikePortControl DockPanel.Dock="Top"></ctls:SpikePortControl>
-      <ctls:ConsoleControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch"></ctls:ConsoleControl>
-    </DockPanel>
     <DockPanel Grid.Column="0" HorizontalAlignment="Stretch">
+      <ctls:SpikePortControl DockPanel.Dock="Top"></ctls:SpikePortControl>
       <ctls:ProgramViewer></ctls:ProgramViewer>
     </DockPanel>
   </Grid>
