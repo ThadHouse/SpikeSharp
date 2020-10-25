@@ -5,8 +5,8 @@
              xmlns:ctls="clr-namespace:SpikeApp.Controls.Status.Views;assembly=SpikeApp"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SpikeApp.Controls.Status.Views.DeviceStatusView">
-  <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-    <StackPanel>
+  <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <StackPanel DockPanel.Dock="Top">
       <TextBlock HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="24" Margin="0,10,0,0" >Device Status</TextBlock>
       <ctls:BatteryView Name="Battery"></ctls:BatteryView>
       <ctls:ThreeAxisView TypeName="Gyro Angle" Name="GyroAngle"/>
@@ -14,5 +14,8 @@
       <ctls:ThreeAxisView TypeName="Accelerometer" Name="Accel"/>
       <ctls:OrientationView Name="Orientation"/>
     </StackPanel>
-  </ScrollViewer>
+    <Grid HorizontalAlignment="Stretch"  Name="DeviceGrid" ColumnDefinitions="*,*" RowDefinitions="*,*,*">
+
+    </Grid>
+  </DockPanel>
 </UserControl>

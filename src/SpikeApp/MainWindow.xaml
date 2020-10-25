@@ -9,11 +9,11 @@
         x:Class="SpikeApp.MainWindow"
         Title="Mindstorms Robotics Inventor - Spike Prime Controller">
   <Grid ColumnDefinitions="250, *, 250">
-    <ctls:ConsoleControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Column="1"></ctls:ConsoleControl>
-    <StackPanel HorizontalAlignment="Stretch"  Grid.Column="2">
-      <ctls:SpikePortControl></ctls:SpikePortControl>
-      <ctlsstatus:DeviceStatusView></ctlsstatus:DeviceStatusView>
-    </StackPanel>
+    <ctlsstatus:DeviceStatusView Grid.Column="1"></ctlsstatus:DeviceStatusView>
+    <DockPanel HorizontalAlignment="Stretch"  Grid.Column="2">
+      <ctls:SpikePortControl DockPanel.Dock="Top"></ctls:SpikePortControl>
+      <ctls:ConsoleControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch"></ctls:ConsoleControl>
+    </DockPanel>
     <DockPanel Grid.Column="0" HorizontalAlignment="Stretch">
       <ctls:ProgramViewer></ctls:ProgramViewer>
     </DockPanel>

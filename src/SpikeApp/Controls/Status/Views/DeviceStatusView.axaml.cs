@@ -17,11 +17,9 @@ namespace SpikeApp.Controls.Status.Views
             var gyroRate = this.FindControl<ThreeAxisView>("GyroRate");
             var accel = this.FindControl<ThreeAxisView>("Accel");
             var orientation = this.FindControl<OrientationView>("Orientation");
+            var deviceGrid = this.FindControl<Grid>("DeviceGrid");
 
-            var scrollView = (ScrollViewer)this.Content;
-            var stackPanel = (StackPanel)scrollView.Content;
-
-            PortStorage storage = new(stackPanel.Children);            
+            PortStorage storage = new(deviceGrid);            
 
             DeviceStatusViewModel vm = new(battery.ViewModel, gyroAngle.ViewModel, gyroRate.ViewModel, accel.ViewModel, orientation.ViewModel, storage);
             ViewModelStorage.StatusViewModel = vm;
