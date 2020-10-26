@@ -25,7 +25,7 @@ namespace SpikeApp.Controls.ViewModels
                 try
                 {
                     var element = await reader.ReadAsync();
-                    ConsoleLog += $"Type: {element.GetType()} RawMsg {element.RawText}\n";
+                    ConsoleLog += $"Type: {element.GetType()} RawMsg:\n {element.RawText}\n";
                 }
                 catch (ChannelClosedException)
                 {

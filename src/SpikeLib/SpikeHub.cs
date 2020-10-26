@@ -136,9 +136,7 @@ namespace SpikeLib
                         catch (Exception ex)
 #pragma warning restore CA1031 // Do not catch general exception types
                         {
-                            Debug.WriteLine(ex);
-                            ;
-                            // TODO handle parsing exception
+                            Debug.WriteLine($"Exception Parsing Line. Exception:\n{ex}\nLine:\n{Encoding.UTF8.GetString(line)}");
                         }
                         buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
                     }

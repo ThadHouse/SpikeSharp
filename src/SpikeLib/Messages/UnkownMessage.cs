@@ -7,14 +7,14 @@ namespace SpikeLib.Messages
     {
         public string RawText { get; }
 
-        public UnknownMessage(JsonDocument document)
+        public UnknownMessage(string msg)
         {
-            if (document == null)
+            if (msg == null)
             {
-                throw new ArgumentNullException(nameof(document));
+                msg = "Null Message?";
             }
 
-            RawText = document.RootElement.GetRawText();
+            RawText = msg;
         }
     }
 }
