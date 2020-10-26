@@ -54,12 +54,5 @@ namespace SpikeApp.Controls.ViewModels
         {
             ConsoleLog = "";
         }
-
-#pragma warning disable CA1822 // Mark members as static
-        public void OpenUnknownWindow()
-#pragma warning restore CA1822 // Mark members as static
-        {
-            ViewModelStorage.StartUnknownWindow();
-        }
     }
 }

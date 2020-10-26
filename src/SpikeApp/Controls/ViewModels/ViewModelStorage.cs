@@ -46,27 +46,5 @@ namespace SpikeApp.Controls.ViewModels
             await UnknownViewModel.RemoveChannelReaderAsync();
             // Todo clear out readers
         }
-
-        private static UnknownMessagesWindow? unknownWindow;
-
-        public static void StartUnknownWindow()
-        {
-            if (unknownWindow == null)
-            {
-                unknownWindow = new UnknownMessagesWindow();
-                unknownWindow.Closing += UnknownWindow_Closing;
-            }
-            unknownWindow.Show();
-        }
-
-        public static void CloseUnknownWindow()
-        {
-            unknownWindow?.Close();
-        }
-
-        private static void UnknownWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
-        {
-            unknownWindow = null;
-        }
     }
 }

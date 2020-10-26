@@ -49,6 +49,9 @@
     <Compile Update="Controls\Views\ProgramViewer.axaml.cs">
       <DependentUpon>ProgramViewer.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Controls\Windows\ConsoleMessagesWindow.axaml.cs">
+      <DependentUpon>ConsoleMessagesWindow.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Properties\WindowSettings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>

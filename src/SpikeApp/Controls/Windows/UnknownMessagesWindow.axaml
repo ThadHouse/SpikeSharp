@@ -6,7 +6,7 @@
         x:Class="SpikeApp.Controls.Windows.UnknownMessagesWindow"
         Title="Unknown Messages">
   <DockPanel>
-    <Button HorizontalAlignment="Center" DockPanel.Dock="Bottom" Command="{Binding Clear}">Clear</Button>
+    <Button HorizontalAlignment="Stretch" DockPanel.Dock="Bottom" Command="{Binding Clear}">Clear</Button>
     <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Center">Unknown Messages Log</TextBlock>
     <ScrollViewer VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
       <TextBox AcceptsReturn="True" TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Text="{Binding ConsoleLog, Mode=TwoWay}" IsReadOnly="true"></TextBox>

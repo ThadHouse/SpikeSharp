@@ -5,11 +5,8 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SpikeApp.Controls.Views.ConsoleControl">
   <DockPanel>
-    <Grid ColumnDefinitions="*,*" DockPanel.Dock="Bottom">
-      <Button HorizontalAlignment="Stretch" Grid.Column="0" Command="{Binding Clear}">Clear</Button>
-      <Button HorizontalAlignment="Stretch" Grid.Column="1" Command="{Binding OpenUnknownWindow}">Open Unknown Messages Window</Button>
-    </Grid>
-    
+    <Button HorizontalAlignment="Stretch" DockPanel.Dock="Bottom" Command="{Binding Clear}">Clear</Button>
+
     <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Center">Console Log</TextBlock>
     <ScrollViewer VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
       <TextBox AcceptsReturn="True" TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Text="{Binding ConsoleLog, Mode=TwoWay}" IsReadOnly="true"></TextBox>

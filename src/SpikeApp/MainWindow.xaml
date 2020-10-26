@@ -8,11 +8,35 @@
         MinWidth="800" MinHeight="400"
         x:Class="SpikeApp.MainWindow"
         Title="Mindstorms Robotics Inventor - Spike Prime Controller">
-  <Grid ColumnDefinitions="250, *">
-    <ctlsstatus:DeviceStatusView Grid.Column="1"></ctlsstatus:DeviceStatusView>
-    <DockPanel Grid.Column="0" HorizontalAlignment="Stretch">
-      <ctls:SpikePortControl DockPanel.Dock="Top"></ctls:SpikePortControl>
-      <ctls:ProgramViewer></ctls:ProgramViewer>
-    </DockPanel>
-  </Grid>
+  <NativeMenu.Menu>
+    <NativeMenu>
+      <NativeMenuItem Header="File">
+        <NativeMenuItem.Menu>
+          <NativeMenu>
+            <NativeMenuItem Header="Quit" Command="{Binding Quit}"/>
+          </NativeMenu>
+        </NativeMenuItem.Menu>
+      </NativeMenuItem>
+      <NativeMenuItem Header="Windows">
+        <NativeMenuItem.Menu>
+          <NativeMenu>
+            <NativeMenuItem Header="Console Viewer" Command="{Binding OpenConsoleViewer}"/>
+            <NativeMenuItem Header="Unknown Messages Viewer" Command="{Binding OpenUnknownMessagesViewer}"/>
+          </NativeMenu>
+        </NativeMenuItem.Menu>
+      </NativeMenuItem>
+    </NativeMenu>
+  </NativeMenu.Menu>
+  <DockPanel>
+    <NativeMenuBar DockPanel.Dock="Top">  
+    </NativeMenuBar>
+    <Grid ColumnDefinitions="250, *">
+      <ctlsstatus:DeviceStatusView Grid.Column="1"></ctlsstatus:DeviceStatusView>
+      <DockPanel Grid.Column="0" HorizontalAlignment="Stretch">
+        <ctls:SpikePortControl DockPanel.Dock="Top"></ctls:SpikePortControl>
+        <ctls:ProgramViewer></ctls:ProgramViewer>
+      </DockPanel>
+    </Grid>
+  </DockPanel>
+
 </Window>
