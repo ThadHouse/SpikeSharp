@@ -70,6 +70,7 @@ namespace SpikeApp.Controls.ViewModels
             var hub = ViewModelStorage.Hub;
             if (hub == null) return;
             int slot = Slot;
+            // TODO Check for closed channel in chain
             await hub.UploadFileAsync(file, slot, Path.GetFileNameWithoutExtension(result[0]));
             if (RunOnDeploy)
             {
